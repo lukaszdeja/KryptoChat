@@ -1,0 +1,14 @@
+# pliki kompilacji Java
+*.class
+
+# foldery IDE
+.idea/
+*.iml
+.vscode/
+
+# buildy (Maven / Gradle)
+target/
+build/
+
+# systemowe
+.DS_Store
