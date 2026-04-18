@@ -1,9 +1,13 @@
+import Services.LoginService;
+import Services.RegisterService;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import Views.*;
+import Controllers.*;
 
 /** class Main
  * Główna klasa warstwy FrontEnd aplikacji - zbudowana w JavaFx, rozszerza interfejs Application
@@ -16,7 +20,9 @@ public class Main extends Application {
     private Scene scene;
 
     private LoginController loginController;
-    //private RegisterController registerController;
+    private LoginService loginService;
+    private RegisterService registerService;
+    private RegisterController registerController;
 
     /** Metoda start
      * inicjuje widoki logowania oraz rejestracji
@@ -27,6 +33,10 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception {
         loginPage = new Login(this::showRegister);
         registerPage = new Register(this::showLogin);
+        loginService = new LoginService();
+        registerService = new RegisterService();
+        loginController = new LoginController(loginPage, loginService, this::showChats);
+        registerController = new RegisterController(registerPage, registerService, this::showLogin);
         setupStage(stage);
     }
 
@@ -43,6 +53,8 @@ public class Main extends Application {
     private void showRegister() {
         scene.setRoot(registerPage.getView());
     }
+
+    private void showChats() { /*scene.setRoot(ChatPage.getView());*/}
 
     /**
      * Główna metoda, która uruchamia aplikację
@@ -61,7 +73,7 @@ public class Main extends Application {
     private void setupStage(Stage stage) {
         scene = new Scene(registerPage.getView(), 1080, 720);
         stage.setTitle("KryptoChat");
-        scene.getStylesheets().add("style.css");
+        scene.getStylesheets().add("Views/style.css");
         stage.setScene(scene);
         stage.show();
     }
