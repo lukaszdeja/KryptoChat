@@ -1,3 +1,5 @@
+package Controllers;
+import Views.Login;
 public class LoginController {
     private Login loginView;
     //private LoginService logservice; //Dodaj później Service

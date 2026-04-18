@@ -4,6 +4,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import Views.*;
 
 /** class Main
  * Główna klasa warstwy FrontEnd aplikacji - zbudowana w JavaFx, rozszerza interfejs Application
@@ -13,9 +14,10 @@ import javafx.stage.Stage;
 public class Main extends Application {
     private Login loginPage;
     private Register registerPage;
+    private Chat chatPage;
     private Scene scene;
 
-    private LoginController loginController;
+    //private LoginController loginController;
     //private RegisterController registerController;
 
     /** Metoda start
@@ -27,6 +29,7 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception {
         loginPage = new Login(this::showRegister);
         registerPage = new Register(this::showLogin);
+        chatPage = new Chat();
         setupStage(stage);
     }
 
@@ -59,9 +62,9 @@ public class Main extends Application {
      * @param stage -
      */
     private void setupStage(Stage stage) {
-        scene = new Scene(registerPage.getView(), 1080, 720);
+        scene = new Scene(chatPage.getView(), 1080, 720);
         stage.setTitle("KryptoChat");
-        scene.getStylesheets().add("style.css");
+        scene.getStylesheets().add("Views/style.css");
         stage.setScene(scene);
         stage.show();
     }
