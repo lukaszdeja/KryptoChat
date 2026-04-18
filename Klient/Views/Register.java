@@ -14,6 +14,12 @@ import javafx.stage.Stage;
  */
 public class Register {
     private VBox view;
+    private TextField username;
+    private PasswordField password;
+    private PasswordField password2;
+    private Button button;
+    private Label info;
+
     /**
      * Konstruktor klasy Register
      * Buduje interfejs rejestracji
@@ -23,23 +29,25 @@ public class Register {
         Label label = new Label("Zarejestruj się");
         label.setAlignment(Pos.CENTER);
         label.getStyleClass().add("title");
-        TextField username = new TextField();
+        username = new TextField();
         username.setPromptText("Login: ");
-        PasswordField password = new PasswordField();
+        password = new PasswordField();
         password.setPromptText("Hasło: ");
-        PasswordField password2 = new PasswordField();
+        password2 = new PasswordField();
         password2.setPromptText("Powtórz hasło: ");
-        Button button = new Button("Zarejestruj");
+        button = new Button("Zarejestruj");
         VBox inputs = new VBox(10);
         inputs.setMaxWidth(500);
         inputs.setPrefWidth(500);
         inputs.setAlignment(Pos.CENTER);
         button.getStyleClass().add("btn");
+        button.setDefaultButton(true);
         Label loginLink = new Label("Masz już konto? Zaloguj się");
         loginLink.getStyleClass().add("link");
         loginLink.setOnMouseClicked(e -> goToLogin.run());
         inputs.getChildren().addAll(username, password, password2, loginLink);
-        view = new VBox(100, label, inputs, button);
+        info = new Label("");
+        view = new VBox(100, label, inputs, button, info);
         view.getStyleClass().add("card");
     }
 
@@ -50,4 +58,9 @@ public class Register {
     public VBox getView() {
         return view;
     }
+    public String getLogin() { return username.getText(); }
+    public String getPassword() { return password.getText(); }
+    public String getPassword2() { return password2.getText();}
+    public Button getButton() { return button; }
+    public Label getLabel() { return  info; }
 }

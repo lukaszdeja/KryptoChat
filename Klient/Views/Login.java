@@ -7,9 +7,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-import javafx.scene.control.Label;
-
-
 /**
  * Klasa Login
  * Frontend widoku logowania - zrealizowany przez VBox
@@ -18,6 +15,10 @@ import javafx.scene.control.Label;
 public class Login {
 
     private VBox view;
+    private TextField username;
+    private PasswordField password;
+    private Button button;
+    private Label info;
 
     /**
      * Konstruktor klasy Login
@@ -28,21 +29,23 @@ public class Login {
         Label label = new Label("Zaloguj się");
         label.setAlignment(Pos.CENTER);
         label.getStyleClass().add("title");
-        TextField username = new TextField();
+        username = new TextField();
         username.setPromptText("Login: ");
-        PasswordField password = new PasswordField();
+        password = new PasswordField();
         password.setPromptText("Hasło: ");
-        Button button = new Button("Zaloguj");
+        button = new Button("Zaloguj");
         VBox inputs = new VBox(10);
         inputs.setMaxWidth(500);
         inputs.setPrefWidth(500);
         inputs.setAlignment(Pos.CENTER);
         button.getStyleClass().add("btn");
+        button.setDefaultButton(true);
         Label registerLink = new Label("Nie masz konta? Zarejestruj się");
         registerLink.getStyleClass().add("link");
         registerLink.setOnMouseClicked(e -> goToRegister.run());
         inputs.getChildren().addAll(username, password, registerLink);
-        view = new VBox(100, label, inputs, button);
+        info = new Label("");
+        view = new VBox(100, label, inputs, button, info);
         view.getStyleClass().add("card");
     }
 
@@ -53,4 +56,9 @@ public class Login {
     public VBox getView() {
         return view;
     }
+
+    public String getLogin() { return username.getText(); }
+    public String getPassword() { return password.getText(); }
+    public Button getButton() { return button; }
+    public Label getLabel() { return  info; }
 }
