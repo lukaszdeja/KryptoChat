@@ -56,6 +56,9 @@ public class Main extends Application {
         scene.setRoot(registerPage.getView());
     }
 
+    /**
+     * Metoda, która zmienia źródło wyświetlania w oknie na okno czatu
+     */
     private void showChats() { scene.setRoot(chatPage.getView());}
 
     /**

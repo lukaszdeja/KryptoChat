@@ -57,8 +57,27 @@ public class Login {
         return view;
     }
 
+    /**
+     * Publiczna metoda zwracająca tekst z pola username
+     * @return String - tekst z pola loginu
+     */
     public String getLogin() { return username.getText(); }
+
+    /**
+     * Publiczna metoda zwracająca tekst z pola password
+     * @return String - tekst z pola hasła
+     */
     public String getPassword() { return password.getText(); }
+
+    /**
+     * Metoda zwracająca referencję do obiektu przycisku
+     * @return Button
+     */
     public Button getButton() { return button; }
+
+    /**
+     * Metoda zwracająca referencję do obiektu Label - komunikatu
+     * @return Label
+     */
     public Label getLabel() { return  info; }
 }

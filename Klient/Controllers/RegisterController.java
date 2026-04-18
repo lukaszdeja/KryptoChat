@@ -5,11 +5,21 @@ import Views.Register;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 
+
+/**
+ * Klasa obsługująca Controller rejestracji - komunikacja interfejsu z backendem
+ */
 public class RegisterController {
     private Register registerView;
     private RegisterService service;
     Runnable goToLogin;
 
+    /**
+     * Konstruktor klasy, inicjuje obiektu widoku rejestracji oraz serwisu rejestracji
+     * @param view - inicjowany widok
+     * @param service - inicjowany serwis
+     * @param goToLogin - callback do metody z Main, ktora przelacza na widok logowania
+     */
     public RegisterController(Register view, RegisterService service, Runnable goToLogin)  {
         this.registerView = view;
         this.service = service;
@@ -17,10 +27,20 @@ public class RegisterController {
         init();
     }
 
+    /**
+     * Metoda inicjujaca controller, dzieki niej Button z widoku reaguje na event klikniecia
+     * Po kliknieciu wywoluje metode handleLogin()
+     */
     private void init() {
         registerView.getButton().setOnAction(e -> handleLogin());
     }
 
+    /**
+     * Metoda obsługująca procedurę rejestracji
+     * Frontendowa walidacja poprawności danych
+     * Przekazanie danych do serwisu
+     * Odpowiedź z serwisu - reakcja na nią
+     */
     private void handleLogin() {
         String username = String.valueOf(registerView.getLogin());
         String password = registerView.getPassword();
@@ -50,6 +70,11 @@ public class RegisterController {
         }
     }
 
+    /**
+     * Pomocnicza metoda walidująca hasło przy użyciu wyrażenia regularnego
+     * @param password sprawdzane hasło
+     * @return boolean - czy haslo spelnia wymog
+     */
     private boolean validPassword(String password) {
         String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).+$";
         return password.matches(regex);
