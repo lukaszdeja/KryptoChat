@@ -15,6 +15,9 @@ public class Main extends Application {
     private Register registerPage;
     private Scene scene;
 
+    private LoginController loginController;
+    //private RegisterController registerController;
+
     /** Metoda start
      * inicjuje widoki logowania oraz rejestracji
      * wywoluje pomocnicza metode setupStage budującą okno
@@ -53,7 +56,7 @@ public class Main extends Application {
      * Metoda, która tworzy scenę - okienko
      * Ustawia tytuł oraz źródło stylów CSS
      * wyświetla okno
-     * @param stage
+     * @param stage -
      */
     private void setupStage(Stage stage) {
         scene = new Scene(registerPage.getView(), 1080, 720);
