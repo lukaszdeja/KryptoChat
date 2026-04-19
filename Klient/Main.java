@@ -1,7 +1,10 @@
 import Services.LoginService;
 import Services.RegisterService;
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import Views.*;
 import Controllers.*;
@@ -36,7 +39,6 @@ public class Main extends Application {
         registerService = new RegisterService();
         loginController = new LoginController(loginPage, loginService, this::showChats);
         registerController = new RegisterController(registerPage, registerService, this::showLogin);
-
         setupStage(stage);
 
         // WYBIERZ WIDOK STARTOWY:
@@ -67,6 +69,10 @@ public class Main extends Application {
                 getClass().getResource("/Views/login.css").toExternalForm()
         );
     }
+
+    /**
+     * Metoda, która zmienia źródło wyświetlania w oknie na okno czatu
+     */
 
     private void showChats() {
         scene.setRoot(chatPage.getView());
