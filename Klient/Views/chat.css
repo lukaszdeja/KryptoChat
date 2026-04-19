@@ -1,0 +1,74 @@
+.root {
+    -fx-background-color: #d7d4ea;
+}
+
+/* TOP BAR */
+.top-bar {
+    -fx-background-color: #606695;
+}
+
+.title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-letter-spacing: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 6, 0.3, 0, 2);
+}
+
+/* LEWA LISTA */
+.user-list {
+    -fx-background-color: white;
+}
+
+/* CHAT */
+.chat-list {
+    -fx-background-color: white;
+    -fx-border-width: 0;
+}
+
+/* INPUT BAR */
+.input-bar {
+    -fx-background-color: transparent;
+}
+
+/* TEXT FIELD */
+.text-field {
+    -fx-background-color: white;
+    -fx-text-fill: black;
+    -fx-prompt-text-fill: #7a7a7a;
+    -fx-background-radius: 6;
+    -fx-border-color: #606695;
+    -fx-border-radius: 6;
+}
+
+/* BUTTON (WYŚLIJ) */
+.button {
+    -fx-background-color: #606695;
+    -fx-text-fill: white;
+    -fx-background-radius: 6;
+}
+
+.button:hover {
+    -fx-background-color: #606695;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 10 15;
+    -fx-font-size: 16px;
+    -fx-text-fill: black;
+}
+
+/* hover */
+.user-list .list-cell:filled:hover {
+    -fx-background-color: #c5cae9;
+    -fx-text-fill: black;
+}
+
+.user-list .list-cell:filled:selected,
+.user-list .list-cell:filled:selected:focused {
+    -fx-background-color: #9fa8da;
+    -fx-text-fill: black;
+}
+
+

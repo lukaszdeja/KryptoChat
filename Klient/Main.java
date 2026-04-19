@@ -1,10 +1,7 @@
 import Services.LoginService;
 import Services.RegisterService;
 import javafx.application.Application;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import Views.*;
 import Controllers.*;
@@ -39,7 +36,12 @@ public class Main extends Application {
         registerService = new RegisterService();
         loginController = new LoginController(loginPage, loginService, this::showChats);
         registerController = new RegisterController(registerPage, registerService, this::showLogin);
+
         setupStage(stage);
+
+        // WYBIERZ WIDOK STARTOWY:
+        showLogin();
+        //showChats();
     }
 
     /**
@@ -47,6 +49,11 @@ public class Main extends Application {
      */
     private void showLogin() {
         scene.setRoot(loginPage.getView());
+
+        scene.getStylesheets().setAll(
+                getClass().getResource("/Views/global.css").toExternalForm(),
+                getClass().getResource("/Views/login.css").toExternalForm()
+        );
     }
 
     /**
@@ -54,9 +61,21 @@ public class Main extends Application {
      */
     private void showRegister() {
         scene.setRoot(registerPage.getView());
+
+        scene.getStylesheets().setAll(
+                getClass().getResource("/Views/global.css").toExternalForm(),
+                getClass().getResource("/Views/login.css").toExternalForm()
+        );
     }
 
-    private void showChats() { scene.setRoot(chatPage.getView());}
+    private void showChats() {
+        scene.setRoot(chatPage.getView());
+
+        scene.getStylesheets().setAll(
+                getClass().getResource("/Views/global.css").toExternalForm(),
+                getClass().getResource("/Views/chat.css").toExternalForm()
+        );
+    }
 
     /**
      * Główna metoda, która uruchamia aplikację
@@ -73,9 +92,8 @@ public class Main extends Application {
      * @param stage -
      */
     private void setupStage(Stage stage) {
-        scene = new Scene(registerPage.getView(), 1080, 720);
+        scene = new Scene(loginPage.getView(), 1080, 720);
         stage.setTitle("KryptoChat");
-        scene.getStylesheets().add("Views/style.css");
         stage.setScene(scene);
         stage.show();
     }

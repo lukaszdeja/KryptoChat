@@ -1,0 +1,55 @@
+.root {
+    -fx-background-color: #d7d4ea;
+}
+
+/* karta logowania */
+.card {
+    -fx-background-color: white;
+    -fx-padding: 30;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 20, 0, 0, 5);
+    -fx-alignment: center;
+}
+
+/* tytuł */
+.title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+/* link */
+.link {
+    -fx-text-fill: #9ea1df;
+    -fx-underline: true;
+}
+
+.link:hover {
+    -fx-text-fill: #9ea1df;
+}
+
+/* inputy */
+.text-field,
+.password-field {
+    -fx-padding: 10;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-background-color: #f2f4f5;
+    -fx-border-color: #ABB3BA;
+}
+
+.text-field:focused,
+.password-field:focused {
+    -fx-border-color: #606695;
+}
+
+/* button */
+.btn {
+    -fx-background-color: #606695;
+    -fx-text-fill: white;
+    -fx-padding: 10;
+    -fx-background-radius: 8;
+}
+
+.btn:hover {
+    -fx-background-color: #606695;
+}

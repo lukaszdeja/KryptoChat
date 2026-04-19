@@ -1,8 +1,9 @@
 .root {
-    -fx-background-color: linear-gradient(to bottom right, #667eea, #764ba2);
+    -fx-background-color: #d7d4ea;
     -fx-font-family: "Segoe UI";
 }
 
+/* karta */
 .card {
     -fx-background-color: white;
     -fx-padding: 30;
@@ -13,42 +14,49 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 20, 0, 0, 5);
 }
 
+/* link */
 .link {
-    -fx-text-fill: blue; 
+    -fx-text-fill: #606695;
     -fx-underline: true;
 }
 
 .link:hover {
-    -fx-text-fill: darkblue;
+    -fx-text-fill: #606695;
     -fx-cursor: hand;
 }
 
+/* tytuł */
 .title {
     -fx-font-size: 22px;
     -fx-font-weight: bold;
     -fx-max-width: 300;
+    -fx-text-fill: #606695;
 }
 
+/* input */
 .text-field, .password-field {
     -fx-padding: 10;
     -fx-background-radius: 8;
     -fx-border-radius: 8;
-    -fx-background-color: #ddd;
-    -fx-border-color: #000000;
+    -fx-background-color: #f2f4f5;
+    -fx-border-color: #ABB3BA;
     -fx-max-width: 300;
 }
 
+/* focus */
 .text-field:focused, .password-field:focused {
-    -fx-border-color: #667eea;
+    -fx-border-color: #606695;
 }
 
+/* button */
 .btn {
-    -fx-background-color: #667eea;
+    -fx-background-color: #606695;
     -fx-text-fill: white;
     -fx-background-radius: 8;
     -fx-padding: 10;
 }
 
+/* hover */
 .btn:hover {
-    -fx-background-color: #5a6fd8;
+    -fx-background-color: #606695;
 }
