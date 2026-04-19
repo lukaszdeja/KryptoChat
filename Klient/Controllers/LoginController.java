@@ -58,7 +58,7 @@ public class LoginController {
             delay.play();
 
         } else {
-            loginView.getLabel().setText("Błędne dane");
+            loginView.getLabel().setText("Wyjątek przez połączenie z serwerem");
         }
     }
 }
