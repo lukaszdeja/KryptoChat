@@ -9,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import Models.Message;
 
 /**
  * Widok aplikacji czatu.
@@ -50,6 +51,7 @@ public class Chat extends GridPane {
      */
     public Chat() {
 
+        // główny layout
         setPadding(new Insets(10));
         setHgap(10);
         setVgap(10);
@@ -88,6 +90,8 @@ public class Chat extends GridPane {
         chatList = new ListView<>(messages);
         chatList.getStyleClass().add("chat-list");
         chatList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        chatList.getSelectionModel().clearSelection();
+        chatList.setMouseTransparent(false);
 
         chatList.setCellFactory(param -> new ListCell<>() {
             @Override
@@ -130,17 +134,22 @@ public class Chat extends GridPane {
         messageField = new TextField();
         messageField.setPromptText("Napisz wiadomość...");
         HBox.setHgrow(messageField, Priority.ALWAYS);
+        messageField.setMaxWidth(Double.MAX_VALUE);
 
         sendButton = new Button("Wyślij");
+        HBox.setHgrow(sendButton, Priority.NEVER);
 
         inputBar = new HBox(10, messageField, sendButton);
         inputBar.setPadding(new Insets(10));
+        inputBar.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(inputBar, Priority.ALWAYS);
         inputBar.getStyleClass().add("input-bar");
 
 
         // CHAT PANE
         VBox chatPane = new VBox(10, chatList, inputBar);
         VBox.setVgrow(chatList, Priority.ALWAYS);
+        chatPane.setFillWidth(true);
 
 
         // GRID LAYOUT
