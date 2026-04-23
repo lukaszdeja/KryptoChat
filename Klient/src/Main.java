@@ -53,8 +53,8 @@ public class Main extends Application {
         scene.setRoot(loginPage.getView());
 
         scene.getStylesheets().setAll(
-                getClass().getResource("/Views/global.css").toExternalForm(),
-                getClass().getResource("/Views/login.css").toExternalForm()
+                getClass().getResource("/global.css").toExternalForm(),
+                getClass().getResource("/login.css").toExternalForm()
         );
     }
 
@@ -65,8 +65,8 @@ public class Main extends Application {
         scene.setRoot(registerPage.getView());
 
         scene.getStylesheets().setAll(
-                getClass().getResource("/Views/global.css").toExternalForm(),
-                getClass().getResource("/Views/login.css").toExternalForm()
+                getClass().getResource("/global.css").toExternalForm(),
+                getClass().getResource("/login.css").toExternalForm()
         );
     }
 
@@ -78,8 +78,8 @@ public class Main extends Application {
         scene.setRoot(chatPage.getView());
 
         scene.getStylesheets().setAll(
-                getClass().getResource("/Views/global.css").toExternalForm(),
-                getClass().getResource("/Views/chat.css").toExternalForm()
+                getClass().getResource("/global.css").toExternalForm(),
+                getClass().getResource("/chat.css").toExternalForm()
         );
     }
 
