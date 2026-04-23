@@ -24,6 +24,7 @@ public class Main extends Application {
     private LoginService loginService;
     private RegisterService registerService;
     private RegisterController registerController;
+    private ChatController chatController;
 
     /** Metoda start
      * inicjuje widoki logowania oraz rejestracji
@@ -39,11 +40,12 @@ public class Main extends Application {
         registerService = new RegisterService();
         loginController = new LoginController(loginPage, loginService, this::showChats);
         registerController = new RegisterController(registerPage, registerService, this::showLogin);
+        chatController = new ChatController(chatPage);
         setupStage(stage);
 
         // WYBIERZ WIDOK STARTOWY:
         showLogin();
-        //showChats();
+       // showChats();
     }
 
     /**
@@ -95,7 +97,7 @@ public class Main extends Application {
      * Metoda, która tworzy scenę - okienko
      * Ustawia tytuł oraz źródło stylów CSS
      * wyświetla okno
-     * @param stage -
+     * @param stage
      */
     private void setupStage(Stage stage) {
         scene = new Scene(loginPage.getView(), 1080, 720);
