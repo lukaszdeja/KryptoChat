@@ -6,6 +6,8 @@
 *.iml
 .vscode/
 
+out/
+
 # buildy (Maven / Gradle)
 target/
 build/
