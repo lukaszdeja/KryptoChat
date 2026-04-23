@@ -83,7 +83,7 @@ public class Chat extends GridPane {
         appTitle = new Label("KryptoChat");
         appTitle.getStyleClass().add("title");
 
-        ImageView icon = new ImageView(new Image(getClass().getResource("/Views/settings.png").toExternalForm()));
+        ImageView icon = new ImageView(new Image(getClass().getResource("/settings.png").toExternalForm()));
         icon.setFitWidth(22);
         icon.setFitHeight(22);
 
