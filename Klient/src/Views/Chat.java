@@ -1,5 +1,7 @@
 package Views;
 
+import Models.User;
+import Models.Message;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -7,35 +9,52 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import Models.Message;
 
 /**
- * Frontend widoku chatów - zrealizowany przez GridPane
- * - lewa: lista użytkowników
- * - prawa: czat + pole do wpisywania
- * - top: pasek aplikacji
+ * Widok aplikacji czatu.
+ * Zawiera:
+ * - listę użytkowników (lewa strona)
+ * - listę wiadomości (prawa część)
+ * - pole do wpisywania wiadomości
+ * - pasek górny aplikacji
  */
 public class Chat extends GridPane {
 
-    private ListView<String> userList;
+    /** Lista użytkowników */
+    private ListView<User> userList;
 
+    /** Lista wyświetlanych wiadomości */
     private ListView<Message> chatList;
+
+    /** Dane wiadomości */
     private ObservableList<Message> messages;
 
+    /** Tytuł aplikacji */
     private Label appTitle;
+
+    /** Przycisk ustawień */
     private Button settingsButton;
 
-    final private TextField messageField;
-    final private Button sendButton;
-    final private HBox inputBar;
+    /** Pole wpisywania wiadomości */
+    private final TextField messageField;
 
+    /** Przycisk wysyłania wiadomości */
+    private final Button sendButton;
+
+    /** Pasek wpisywania wiadomości */
+    private final HBox inputBar;
+
+    /**
+     * Konstruktor widoku czatu.
+     * Buduje cały layout GUI.
+     */
     public Chat() {
 
-        // główny layout
         setPadding(new Insets(10));
         setHgap(10);
         setVgap(10);
 
+        // kolumny: użytkownicy + czat
         ColumnConstraints leftCol = new ColumnConstraints();
         leftCol.setPercentWidth(25);
 
@@ -45,6 +64,7 @@ public class Chat extends GridPane {
 
         getColumnConstraints().addAll(leftCol, rightCol);
 
+        // wiersze: topbar + content
         RowConstraints topRow = new RowConstraints();
         topRow.setPrefHeight(60);
 
@@ -53,37 +73,44 @@ public class Chat extends GridPane {
 
         getRowConstraints().addAll(topRow, contentRow);
 
-        // lista użytkowników
+        // Użytkownicy
         userList = new ListView<>();
-        userList.getItems().addAll("Jan", "Anna", "Kuba");
+        userList.getItems().addAll(
+                new User(1, "Ania", 1),
+                new User(2, "Kasia", 1)
+        );
         userList.setMinHeight(30);
         userList.getStyleClass().add("user-list");
 
-        // chat
+
+        // Wiadomości
         messages = FXCollections.observableArrayList();
         chatList = new ListView<>(messages);
         chatList.getStyleClass().add("chat-list");
         chatList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        chatList.getSelectionModel().clearSelection();
-        chatList.setMouseTransparent(false);
 
         chatList.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(Message msg, boolean empty) {
                 super.updateItem(msg, empty);
+
                 if (empty || msg == null) {
                     setText(null);
                 } else {
+                    // User.toString() zwraca username
                     setText(msg.getSender() + ": " + msg.getContent());
                 }
             }
         });
 
-        // góra
+
+        // TOP BAR
         appTitle = new Label("KryptoChat");
         appTitle.getStyleClass().add("title");
 
-        ImageView icon = new ImageView(new Image(getClass().getResource("/Views/settings.png").toExternalForm()));
+        ImageView icon = new ImageView(
+                new Image(getClass().getResource("/settings.png").toExternalForm())
+        );
         icon.setFitWidth(22);
         icon.setFitHeight(22);
 
@@ -98,27 +125,25 @@ public class Chat extends GridPane {
         topBar.setPadding(new Insets(20));
         topBar.getStyleClass().add("top-bar");
 
-        // pole do wpisywania
+
+        // Pole do wpisywania wiadomości
         messageField = new TextField();
         messageField.setPromptText("Napisz wiadomość...");
         HBox.setHgrow(messageField, Priority.ALWAYS);
-        messageField.setMaxWidth(Double.MAX_VALUE);
 
         sendButton = new Button("Wyślij");
-        HBox.setHgrow(sendButton, Priority.NEVER);
 
         inputBar = new HBox(10, messageField, sendButton);
         inputBar.setPadding(new Insets(10));
-        inputBar.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(inputBar, Priority.ALWAYS);
         inputBar.getStyleClass().add("input-bar");
 
-        // panel chatu
+
+        // CHAT PANE
         VBox chatPane = new VBox(10, chatList, inputBar);
         VBox.setVgrow(chatList, Priority.ALWAYS);
-        chatPane.setFillWidth(true);
 
-        // dodawanie do grid
+
+        // GRID LAYOUT
         add(topBar, 0, 0, 2, 1);
         add(userList, 0, 1);
         add(chatPane, 1, 1);
@@ -126,28 +151,23 @@ public class Chat extends GridPane {
         GridPane.setHgrow(chatPane, Priority.ALWAYS);
         GridPane.setVgrow(chatPane, Priority.ALWAYS);
         GridPane.setVgrow(userList, Priority.ALWAYS);
-
-        // akcje
-        sendButton.setOnAction(e -> sendMessage());
-        messageField.setOnAction(e -> sendMessage());
     }
 
-    /** Ustawia sposób wyświetlania elementów ListView (Message).
-     * Każdy Message jest renderowany jako tekst: "sender: content".
-     * Jeśli element jest pusty, komórka jest czyszczona. */
-    private void sendMessage() {
-        String user = userList.getSelectionModel().getSelectedItem();
-        String text = messageField.getText();
+    // Gettery
+    public Button getSendButton() {
+        return sendButton;
+    }
 
-        if (text.isEmpty()) return;
+    public TextField getMessageField() {
+        return messageField;
+    }
 
-        if (user == null) {
-            messages.add(new Message("System", "Wybierz użytkownika!"));
-        } else {
-            messages.add(new Message("Ja", text));
-        }
+    public ListView<User> getUserList() {
+        return userList;
+    }
 
-        messageField.clear();
+    public ObservableList<Message> getMessages() {
+        return messages;
     }
 
     public GridPane getView() {

@@ -24,6 +24,7 @@ public class Main extends Application {
     private LoginService loginService;
     private RegisterService registerService;
     private RegisterController registerController;
+    private ChatController chatController;
 
     /** Metoda start
      * inicjuje widoki logowania oraz rejestracji
@@ -39,11 +40,12 @@ public class Main extends Application {
         registerService = new RegisterService();
         loginController = new LoginController(loginPage, loginService, this::showChats);
         registerController = new RegisterController(registerPage, registerService, this::showLogin);
+        chatController = new ChatController(chatPage);
         setupStage(stage);
 
         // WYBIERZ WIDOK STARTOWY:
-        showLogin();
-        //showChats();
+        //showLogin();
+        showChats();
     }
 
     /**
@@ -53,8 +55,8 @@ public class Main extends Application {
         scene.setRoot(loginPage.getView());
 
         scene.getStylesheets().setAll(
-                getClass().getResource("/Views/global.css").toExternalForm(),
-                getClass().getResource("/Views/login.css").toExternalForm()
+                getClass().getResource("/global.css").toExternalForm(),
+                getClass().getResource("/login.css").toExternalForm()
         );
     }
 
@@ -65,8 +67,8 @@ public class Main extends Application {
         scene.setRoot(registerPage.getView());
 
         scene.getStylesheets().setAll(
-                getClass().getResource("/Views/global.css").toExternalForm(),
-                getClass().getResource("/Views/login.css").toExternalForm()
+                getClass().getResource("/global.css").toExternalForm(),
+                getClass().getResource("/login.css").toExternalForm()
         );
     }
 
@@ -78,8 +80,8 @@ public class Main extends Application {
         scene.setRoot(chatPage.getView());
 
         scene.getStylesheets().setAll(
-                getClass().getResource("/Views/global.css").toExternalForm(),
-                getClass().getResource("/Views/chat.css").toExternalForm()
+                getClass().getResource("/global.css").toExternalForm(),
+                getClass().getResource("/chat.css").toExternalForm()
         );
     }
 
@@ -95,7 +97,7 @@ public class Main extends Application {
      * Metoda, która tworzy scenę - okienko
      * Ustawia tytuł oraz źródło stylów CSS
      * wyświetla okno
-     * @param stage -
+     * @param stage
      */
     private void setupStage(Stage stage) {
         scene = new Scene(loginPage.getView(), 1080, 720);
