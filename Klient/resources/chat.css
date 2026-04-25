@@ -26,6 +26,7 @@
     -fx-border-width: 0;
 }
 
+
 /* INPUT BAR */
 .input-bar {
     -fx-background-color: transparent;
@@ -45,11 +46,12 @@
 .button {
     -fx-background-color: #606695;
     -fx-text-fill: white;
-    -fx-background-radius: 6;
+    -fx-background-radius: 20px;
+    -fx-cursor: hand;
 }
 
 .button:hover {
-    -fx-background-color: #606695;
+    -fx-background-color: #4f547c;
 }
 
 .list-cell {
@@ -69,6 +71,10 @@
 .user-list .list-cell:filled:selected:focused {
     -fx-background-color: #9fa8da;
     -fx-text-fill: black;
+}
+
+.message {
+    -fx-max-width: infinity;
 }
 
 
