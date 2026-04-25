@@ -5,28 +5,28 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
-public class Start extends VBox {
+public class CreateGroup extends VBox {
 
     private TextField codeField;
     private TextField nameField;
     private Button joinBtn;
     private Button createBtn;
+    private Label message;
 
-    public Start() {
+    public CreateGroup() {
 
         setSpacing(30);
         setAlignment(Pos.CENTER);
         setPadding(new Insets(40));
         getStyleClass().add("root");
 
-        // Tytuł
         Label title = new Label("KryptoChat");
         title.getStyleClass().add("title");
 
         Label subtitle = new Label("Dołącz do grupy lub utwórz nową");
         subtitle.getStyleClass().add("subtitle");
 
-        // Dołączanie do grupy
+        // Dołącz do grupy
         VBox joinBox = new VBox(15);
         joinBox.setAlignment(Pos.CENTER);
         joinBox.getStyleClass().add("card");
@@ -41,7 +41,7 @@ public class Start extends VBox {
 
         joinBox.getChildren().addAll(joinLabel, codeField, joinBtn);
 
-        // Tworzenie grupy
+        // Utwórz grupe
         VBox createBox = new VBox(15);
         createBox.setAlignment(Pos.CENTER);
         createBox.getStyleClass().add("card");
@@ -56,26 +56,24 @@ public class Start extends VBox {
 
         createBox.getChildren().addAll(createLabel, nameField, createBtn);
 
+        // komunikat
+        message = new Label();
+        message.getStyleClass().add("error-text");
+
         HBox options = new HBox(30, joinBox, createBox);
         options.setAlignment(Pos.CENTER);
 
-        getChildren().addAll(title, subtitle, options);
+        getChildren().addAll(title, subtitle, options, message);
     }
 
     // Gettery
-    public Button getJoinBtn() {
-        return joinBtn;
-    }
+    public Button getJoin() { return joinBtn; }
+    public Button getCreate() { return createBtn; }
 
-    public Button getCreateBtn() {
-        return createBtn;
-    }
+    public TextField getCodeField() { return codeField; }
+    public TextField getGroupNameField() { return nameField; }
 
-    public String getCode() {
-        return codeField.getText();
-    }
+    public Label getMessage() { return message; }
 
-    public String getGroupName() {
-        return nameField.getText();
-    }
+    public VBox getView() { return this; }
 }

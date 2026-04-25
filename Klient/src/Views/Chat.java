@@ -9,7 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import Models.Message;
+
 
 /**
  * Widok aplikacji czatu.
@@ -138,12 +138,24 @@ public class Chat extends GridPane {
 
         // Pole do wpisywania wiadomości
         messageField = new TextField();
+        messageField.getStyleClass().add("message");
         messageField.setPromptText("Napisz wiadomość...");
         HBox.setHgrow(messageField, Priority.ALWAYS);
         messageField.setMaxWidth(Double.MAX_VALUE);
 
         sendButton = new Button("Wyślij");
         HBox.setHgrow(sendButton, Priority.NEVER);
+        sendButton.setPrefSize(38, 38);
+        sendButton.setMinSize(38, 38);
+        sendButton.setMaxSize(38, 38);
+        ImageView arrow = new ImageView(
+                new Image(getClass().getResource("/arrow.png").toExternalForm())
+        );
+        arrow.setFitWidth(16);
+        arrow.setFitHeight(16);
+        arrow.setPreserveRatio(true);
+        sendButton.setGraphic(arrow);
+        sendButton.setText("");
 
         inputBar = new HBox(10, messageField, sendButton);
         inputBar.setPadding(new Insets(10));
@@ -153,7 +165,7 @@ public class Chat extends GridPane {
 
 
         // CHAT PANE
-        VBox chatPane = new VBox(10, chatList, inputBar);
+        VBox chatPane = new VBox(0, chatList, inputBar);
         VBox.setVgrow(chatList, Priority.ALWAYS);
         chatPane.setFillWidth(true);
 
@@ -162,6 +174,10 @@ public class Chat extends GridPane {
         add(topBar, 0, 0, 2, 1);
         add(userList, 0, 1);
         add(chatPane, 1, 1);
+        messageField.setMaxWidth(Double.MAX_VALUE);
+        inputBar.setMaxWidth(Double.MAX_VALUE);
+        chatPane.setMaxWidth(Double.MAX_VALUE);
+        chatList.setMaxWidth(Double.MAX_VALUE);
 
         GridPane.setHgrow(chatPane, Priority.ALWAYS);
         GridPane.setVgrow(chatPane, Priority.ALWAYS);

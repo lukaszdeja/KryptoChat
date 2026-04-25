@@ -1,3 +1,4 @@
+import Services.GroupService;
 import Services.LoginService;
 import Services.RegisterService;
 import javafx.application.Application;
@@ -19,12 +20,14 @@ public class Main extends Application {
     private Register registerPage;
     private Chat chatPage;
     private Scene scene;
-
+    private CreateGroup groupPage;
     private LoginController loginController;
     private LoginService loginService;
     private RegisterService registerService;
     private RegisterController registerController;
     private ChatController chatController;
+    private GroupController groupController;
+    private GroupService groupService;
 
     /** Metoda start
      * inicjuje widoki logowania oraz rejestracji
@@ -36,16 +39,20 @@ public class Main extends Application {
         loginPage = new Login(this::showRegister);
         registerPage = new Register(this::showLogin);
         chatPage = new Chat();
+        groupPage = new CreateGroup();
         loginService = new LoginService();
         registerService = new RegisterService();
+        groupService = new GroupService();
         loginController = new LoginController(loginPage, loginService, this::showChats);
         registerController = new RegisterController(registerPage, registerService, this::showLogin);
         chatController = new ChatController(chatPage);
+        groupController = new GroupController(groupPage, groupService, this::showChats);
         setupStage(stage);
 
         // WYBIERZ WIDOK STARTOWY:
-        //showLogin();
-        showChats();
+       // showLogin();
+       // showChats();
+        showCreateGroup();
     }
 
     /**
@@ -82,6 +89,15 @@ public class Main extends Application {
         scene.getStylesheets().setAll(
                 getClass().getResource("/global.css").toExternalForm(),
                 getClass().getResource("/chat.css").toExternalForm()
+        );
+    }
+
+    private void showCreateGroup() {
+        scene.setRoot(groupPage.getView());
+
+        scene.getStylesheets().setAll(
+                getClass().getResource("/global.css").toExternalForm(),
+                getClass().getResource("/groups.css").toExternalForm()
         );
     }
 
