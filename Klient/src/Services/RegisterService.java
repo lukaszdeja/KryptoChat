@@ -39,11 +39,8 @@ public class RegisterService {
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200) {
-                return true;
-            } else {
-                return false;
-            }
+
+            return response.statusCode() == 200;
         } catch (Exception e) {
             e.printStackTrace();
         }

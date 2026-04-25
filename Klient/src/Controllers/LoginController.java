@@ -12,18 +12,18 @@ import javafx.util.Duration;
 public class LoginController {
     private Login loginView;
     private LoginService logservice;
-    Runnable goToChats;
+    Runnable goToGroups;
 
     /**
      * Konstruktor klasy, inicjuje pola klasy i wywoluje metode init()
      * @param view - obiekt okna logowania (UI)
      * @param service - obiekt serwisu logowania
-     * @param goToChats - callback do funkcji przelaczajacej widok na okno czatu
+     * @param goToGroups - callback do funkcji przelaczajacej widok na okno czatu
      */
-    public LoginController(Login view, LoginService service, Runnable goToChats)  {
+    public LoginController(Login view, LoginService service, Runnable goToGroups)  {
         this.loginView = view;
         this.logservice = service;
-        this.goToChats = goToChats;
+        this.goToGroups = goToGroups;
         init();
     }
 
@@ -54,7 +54,7 @@ public class LoginController {
         if (success) {
             loginView.getLabel().setText("Zalogowano!");
             PauseTransition delay = new PauseTransition(Duration.seconds(2));
-            delay.setOnFinished(e -> goToChats.run());
+            delay.setOnFinished(e -> goToGroups.run());
             delay.play();
 
         } else {

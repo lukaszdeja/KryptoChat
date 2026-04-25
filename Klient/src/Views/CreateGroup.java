@@ -1,105 +1,93 @@
 package Views;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.image.Image;
-import javafx.geometry.Pos;
-import javafx.scene.image.ImageView;
 
-public class CreateGroup {
-
-    private VBox Box;
-
-    private Button createButton;
-
-    private Button joinButton;
-
-    private TextField groupNameField;
+/**
+ * Klasa CreateGroup
+ * Frontend widoku dołączania do grupy - już istniejącej lub utworzenie nowej, zrealizowany przez VBox
+ */
+public class CreateGroup extends VBox {
 
     private TextField codeField;
-
+    private TextField nameField;
+    private Button joinBtn;
+    private Button createBtn;
     private Label message;
 
+    /**
+     * Konstruktor klasy CreateGroup
+     * Buduje interfejs dołączanie/tworzenia grupy
+     */
     public CreateGroup() {
-        Label appTitle = new Label("KryptoChat");
-        appTitle.getStyleClass().add("title");
-        ImageView icon = new ImageView(
-                new Image(getClass().getResource("/settings.png").toExternalForm())
-        );
-        icon.setFitWidth(22);
-        icon.setFitHeight(22);
 
-        Button settingsButton = new Button();
-        settingsButton.setGraphic(icon);
-        settingsButton.setStyle("-fx-background-color: transparent;");
+        setSpacing(30);
+        setAlignment(Pos.CENTER);
+        setPadding(new Insets(40));
+        getStyleClass().add("root");
 
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+        Label title = new Label("KryptoChat");
+        title.getStyleClass().add("title");
+        title.setMaxWidth(Double.MAX_VALUE);
+        title.setAlignment(Pos.CENTER);
 
-        HBox topBar = new HBox(10, appTitle, spacer, settingsButton);
-        topBar.setPadding(new Insets(20));
-        topBar.getStyleClass().add("top-bar");
+        Label subtitle = new Label("Nie należysz do żadnej grupy - dołącz do istniejącej lub utwórz nową");
+        subtitle.getStyleClass().add("subtitle");
 
-        Label header = new Label("Nie należysz do żadnej grupy");
-        header.getStyleClass().add("header");
-
-        Label createLabel = new Label("Utwórz grupę");
-
-        groupNameField = new TextField();
-        groupNameField.setPromptText("Nazwa grupy");
-
-        createButton = new Button("Utwórz");
-
-        Label orLabel = new Label("LUB");
+        // Dołącz do grupy
+        VBox joinBox = new VBox(15);
+        joinBox.setAlignment(Pos.CENTER);
+        joinBox.getStyleClass().add("card");
 
         Label joinLabel = new Label("Dołącz do grupy");
+        joinLabel.getStyleClass().add("join-label");
 
         codeField = new TextField();
-        codeField.setPromptText("Kod grupy");
+        codeField.setPromptText("Wpisz kod grupy");
+        codeField.getStyleClass().add("input");
 
-        joinButton = new Button("Dołącz");
+        joinBtn = new Button("Dołącz");
+        joinBtn.getStyleClass().add("join-btn");
 
-        VBox createBox = new VBox(8, createLabel, groupNameField, createButton);
-        VBox joinBox = new VBox(8, joinLabel, codeField, joinButton);
-        joinBox.setAlignment(Pos.CENTER);
+        joinBox.getChildren().addAll(joinLabel, codeField, joinBtn);
+
+        // Utwórz grupe
+        VBox createBox = new VBox(15);
         createBox.setAlignment(Pos.CENTER);
+        createBox.getStyleClass().add("card");
+
+        Label createLabel = new Label("Utwórz grupę");
+        createLabel.getStyleClass().add("create-label");
+
+        nameField = new TextField();
+        nameField.setPromptText("Wpisz nazwę grupy");
+        nameField.getStyleClass().add("input");
+
+        createBtn = new Button("Utwórz");
+        createBtn.getStyleClass().add("create-btn");
+
+        createBox.getChildren().addAll(createLabel, nameField, createBtn);
+
+        // komunikat
         message = new Label();
-        VBox content = new VBox(20, header, createBox, orLabel, joinBox, message);
-        content.setPadding(new Insets(40));
-        content.setMaxWidth(600);
-        content.setAlignment(Pos.CENTER);
+        message.getStyleClass().add("error-text");
 
-        StackPane centerWrapper = new StackPane(content);
-        StackPane.setAlignment(content, Pos.CENTER);
+        HBox options = new HBox(30, joinBox, createBox);
+        options.setAlignment(Pos.CENTER);
 
-        Box = new VBox(10, topBar, centerWrapper);
-        VBox.setVgrow(centerWrapper, Priority.ALWAYS);
+        getChildren().addAll(title, subtitle, options, message);
     }
 
-    public VBox getView() {
-        return Box;
-    }
+    // Gettery
+    public Button getJoin() { return joinBtn; }
+    public Button getCreate() { return createBtn; }
 
-    public Button getCreate() {
-        return createButton;
-    }
+    public TextField getCodeField() { return codeField; }
+    public TextField getGroupNameField() { return nameField; }
 
-    public Button getJoin() {
-        return joinButton;
-    }
+    public Label getMessage() { return message; }
 
-    public TextField getGroupNameField() {
-        return groupNameField;
-    }
-
-    public TextField getCodeField() {
-        return codeField;
-    }
-
-    public Label getMessage() {
-        return message;
-    }
+    public VBox getView() { return this; }
 }

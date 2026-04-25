@@ -50,9 +50,9 @@ public class Main extends Application {
         setupStage(stage);
 
         // WYBIERZ WIDOK STARTOWY:
-       // showLogin();
-       // showChats();
-        showCreateGroup();
+        //showLogin();
+        // showChats();
+         showCreateGroup();
     }
 
     /**
@@ -82,7 +82,6 @@ public class Main extends Application {
     /**
      * Metoda, która zmienia źródło wyświetlania w oknie na okno czatu
      */
-
     private void showChats() {
         scene.setRoot(chatPage.getView());
 
@@ -92,6 +91,9 @@ public class Main extends Application {
         );
     }
 
+    /**
+     * Metoda, która zmienia źródło wyświetlania w oknie na okno czatu
+     */
     private void showCreateGroup() {
         scene.setRoot(groupPage.getView());
 
