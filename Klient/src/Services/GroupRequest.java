@@ -13,25 +13,20 @@ public class GroupRequest {
 
     private String groupName;
     private String code;
-
     public GroupRequest() {}
 
     // Settery
-
     public void setGroupName(String groupName) {
         this.groupName = groupName;
     }
-
     public void setCode(String code) {
         this.code = code;
     }
 
     // Gettery
-
     public String getGroupName() {
         return groupName;
     }
-
     public String getCode() {
         return code;
     }

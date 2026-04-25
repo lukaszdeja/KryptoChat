@@ -2,6 +2,8 @@ package Controllers;
 
 import Views.CreateGroup;
 import Services.GroupService;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
 
 /**
  * Klasa obsługująca controller tworzenia lub dołączania do grupy - połączenie interfejsu z backendem
@@ -55,11 +57,13 @@ public class GroupController {
         boolean success = groupService.createGroup(groupName);
 
         if(success) {
-            groupView.getMessage().setText("");
-            goToChats.run();
+            groupView.getMessage().setText("Utworzono grupe");
+            PauseTransition delay = new PauseTransition(Duration.seconds(2));
+            delay.setOnFinished(e -> goToChats.run());
+            delay.play();
         }
         else {
-            groupView.getMessage().setText("Nie udało się utworzyć grupy");
+            groupView.getMessage().setText("Zbyt krótka nazwa grupy (min. 3 znaki)");
         }
     }
 
@@ -81,8 +85,10 @@ public class GroupController {
         boolean success = groupService.joinGroup(code);
 
         if(success) {
-            groupView.getMessage().setText("");
-            goToChats.run();
+            groupView.getMessage().setText("Dołączono do grupy");
+            PauseTransition delay = new PauseTransition(Duration.seconds(2));
+            delay.setOnFinished(e -> goToChats.run());
+            delay.play();
         }
         else {
             groupView.getMessage().setText("Niepoprawny kod grupy");

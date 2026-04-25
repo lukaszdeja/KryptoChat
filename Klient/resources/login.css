@@ -1,5 +1,5 @@
 .root {
-    -fx-background-color: #d7d4ea;
+    -fx-background-color: #f3f2fa;
 }
 
 /* karta logowania */
@@ -13,18 +13,18 @@
 
 /* tytuł */
 .title {
-    -fx-font-size: 22px;
+    -fx-font-size: 26px;
     -fx-font-weight: bold;
 }
 
 /* link */
 .link {
-    -fx-text-fill: #9ea1df;
+    -fx-text-fill: #606695;
     -fx-underline: true;
 }
 
 .link:hover {
-    -fx-text-fill: #9ea1df;
+    -fx-text-fill: #606695;
 }
 
 /* inputy */

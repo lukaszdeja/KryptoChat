@@ -1,17 +1,31 @@
 .root {
-    -fx-background-color: white;
+    -fx-background-color: #f3f2fa ;
 }
 
 /* Tytuły */
 .title {
-    -fx-font-size: 28px;
+    -fx-font-size: 35px;
     -fx-text-fill: #606695;
     -fx-font-weight: bold;
+    -fx-letter-spacing: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 6, 0.3, 0, 2);
 }
 
 .subtitle {
-    -fx-font-size: 14px;
-    -fx-text-fill: #9fa8da;
+    -fx-font-size: 16px;
+    -fx-text-fill: #606695;
+}
+
+.join-label {
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+    -fx-text-fill: #606695;
+}
+
+.create-label {
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+    -fx-text-fill: #606695;
 }
 
 /* Karty */
@@ -24,32 +38,38 @@
     -fx-min-width: 250px;
 }
 
-/* Pola tekstowe */
-.text-field {
+/* Pola do wpisywania */
+.input {
     -fx-pref-width: 200px;
     -fx-background-radius: 8;
+    -fx-border-color: black;
 }
 
-/* Przycisk główny */
-.primary-btn {
+/* Przyciski */
+.join-btn {
     -fx-background-color: #606695;
     -fx-text-fill: white;
     -fx-background-radius: 8;
     -fx-padding: 8 20;
 }
 
-.primary-btn:hover {
+.join-btn:hover {
     -fx-background-color: #4f547a;
 }
 
-/* Przycisk drugi */
-.secondary-btn {
-    -fx-background-color: #9fa8da;
+.create-btn {
+    -fx-background-color: #606695;
     -fx-text-fill: white;
     -fx-background-radius: 8;
     -fx-padding: 8 20;
 }
 
-.secondary-btn:hover {
-    -fx-background-color: #8c95c7;
+.create-btn:hover {
+    -fx-background-color: #4f547a;
+}
+
+/* Komunikaty */
+.error-text {
+    -fx-text-fill: #606695;
+    -fx-font-size: 13px;
 }

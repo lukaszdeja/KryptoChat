@@ -22,8 +22,10 @@ public class CreateGroup extends VBox {
 
         Label title = new Label("KryptoChat");
         title.getStyleClass().add("title");
+        title.setMaxWidth(Double.MAX_VALUE);
+        title.setAlignment(Pos.CENTER);
 
-        Label subtitle = new Label("Dołącz do grupy lub utwórz nową");
+        Label subtitle = new Label("Nie należysz do żadnej grupy - dołącz do istniejącej lub utwórz nową");
         subtitle.getStyleClass().add("subtitle");
 
         // Dołącz do grupy
@@ -32,12 +34,14 @@ public class CreateGroup extends VBox {
         joinBox.getStyleClass().add("card");
 
         Label joinLabel = new Label("Dołącz do grupy");
+        joinLabel.getStyleClass().add("join-label");
 
         codeField = new TextField();
         codeField.setPromptText("Wpisz kod grupy");
+        codeField.getStyleClass().add("input");
 
         joinBtn = new Button("Dołącz");
-        joinBtn.getStyleClass().add("primary-btn");
+        joinBtn.getStyleClass().add("join-btn");
 
         joinBox.getChildren().addAll(joinLabel, codeField, joinBtn);
 
@@ -47,12 +51,14 @@ public class CreateGroup extends VBox {
         createBox.getStyleClass().add("card");
 
         Label createLabel = new Label("Utwórz grupę");
+        createLabel.getStyleClass().add("create-label");
 
         nameField = new TextField();
         nameField.setPromptText("Wpisz nazwę grupy");
+        nameField.getStyleClass().add("input");
 
         createBtn = new Button("Utwórz");
-        createBtn.getStyleClass().add("secondary-btn");
+        createBtn.getStyleClass().add("create-btn");
 
         createBox.getChildren().addAll(createLabel, nameField, createBtn);
 

@@ -21,25 +21,12 @@ import javafx.scene.image.ImageView;
  */
 public class Chat extends GridPane {
 
-    /** Lista użytkowników */
     private ListView<User> userList;
-
-    /** Lista wyświetlanych wiadomości */
     private ListView<Message> chatList;
-
-    /** Dane wiadomości */
     private ObservableList<Message> messages;
-
-    /** Tytuł aplikacji */
     private Label appTitle;
-
-    /** Przycisk ustawień */
     private Button settingsButton;
-
-    /** Pole wpisywania wiadomości */
     private final TextField messageField;
-
-    /** Przycisk wysyłania wiadomości */
     private final Button sendButton;
 
     /** Pasek wpisywania wiadomości */
@@ -52,7 +39,7 @@ public class Chat extends GridPane {
     public Chat() {
 
         // główny layout
-        setPadding(new Insets(10));
+        setPadding(new Insets(0));
         setHgap(10);
         setVgap(10);
 
@@ -115,17 +102,13 @@ public class Chat extends GridPane {
         var url = getClass().getResource("/settings.png");
 
         ImageView icon = new ImageView(new Image(url.toExternalForm()));
-        icon.setFitWidth(22);
-        icon.setFitHeight(22);
+        icon.setFitWidth(24);
+        icon.setFitHeight(24);
         icon.setPreserveRatio(true);
 
         settingsButton = new Button();
         settingsButton.setGraphic(icon);
         settingsButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        settingsButton.setStyle("-fx-background-color: transparent;");
-
-        settingsButton = new Button();
-        settingsButton.setGraphic(icon);
         settingsButton.setStyle("-fx-background-color: transparent;");
 
         Region spacer = new Region();
@@ -143,19 +126,16 @@ public class Chat extends GridPane {
         HBox.setHgrow(messageField, Priority.ALWAYS);
         messageField.setMaxWidth(Double.MAX_VALUE);
 
-        sendButton = new Button("Wyślij");
-        HBox.setHgrow(sendButton, Priority.NEVER);
-        sendButton.setPrefSize(38, 38);
-        sendButton.setMinSize(38, 38);
-        sendButton.setMaxSize(38, 38);
-        ImageView arrow = new ImageView(
-                new Image(getClass().getResource("/arrow.png").toExternalForm())
-        );
-        arrow.setFitWidth(16);
-        arrow.setFitHeight(16);
-        arrow.setPreserveRatio(true);
-        sendButton.setGraphic(arrow);
-        sendButton.setText("");
+        sendButton = new Button();
+        var url1 = getClass().getResource("/arrow.png");
+        ImageView ikonka = new ImageView(new Image(url1.toExternalForm()));
+        ikonka.setFitWidth(22);
+        ikonka.setFitHeight(22);
+        ikonka.setPreserveRatio(true);
+
+        sendButton.setGraphic(ikonka);
+        sendButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        sendButton.setStyle("-fx-background-color: transparent;");
 
         inputBar = new HBox(10, messageField, sendButton);
         inputBar.setPadding(new Insets(10));

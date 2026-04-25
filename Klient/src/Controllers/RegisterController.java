@@ -35,6 +35,7 @@ public class RegisterController {
         registerView.getButton().setOnAction(e -> handleLogin());
     }
 
+
     /**
      * Metoda obsługująca procedurę rejestracji
      * Frontendowa walidacja poprawności danych
