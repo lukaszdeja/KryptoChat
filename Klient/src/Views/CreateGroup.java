@@ -5,6 +5,10 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
+/**
+ * Klasa CreateGroup
+ * Frontend widoku dołączania do grupy - już istniejącej lub utworzenie nowej, zrealizowany przez VBox
+ */
 public class CreateGroup extends VBox {
 
     private TextField codeField;
@@ -13,6 +17,10 @@ public class CreateGroup extends VBox {
     private Button createBtn;
     private Label message;
 
+    /**
+     * Konstruktor klasy CreateGroup
+     * Buduje interfejs dołączanie/tworzenia grupy
+     */
     public CreateGroup() {
 
         setSpacing(30);

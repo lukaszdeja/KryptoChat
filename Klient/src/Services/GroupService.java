@@ -8,7 +8,9 @@ import java.net.http.HttpResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Klasa obsługuje operacje związane z grupami (tworzenie, dołączanie)
+ * Klasa obsługująca operacje związane z grupami (tworzenie oraz dołączanie).
+ * Realizuje komunikację z backendem poprzez wysyłanie żądań HTTP w formacie JSON.
+ * Na podstawie odpowiedzi serwera (status HTTP) określa powodzenie operacji.
  */
 public class GroupService {
 
@@ -16,9 +18,11 @@ public class GroupService {
     private final ObjectMapper mapper = new ObjectMapper();
 
     /**
-     * Tworzy nową grupę wysyłając nazwę do backendu
-     * @param groupName nazwa grupy
-     * @return true jeśli sukces
+     * Metoda obsługująca tworzenie grupy
+     * Metoda tworzy obiekt requesta, przesyła go w formacie JSON na serwer
+     * i na podstawie odpowiedzi HTTP określa czy operacja zakończyła się sukcesem
+     * @param groupName nazwa tworzonej grupy
+     * @return boolean - czy udało się utworzyć grupę
      */
     public boolean createGroup(String groupName) {
 
@@ -45,9 +49,11 @@ public class GroupService {
     }
 
     /**
-     * Dołącza do istniejącej grupy na podstawie kodu
+     * Metoda obsługująca dołączanie do grupy
+     * Metoda tworzy obiekt requesta, przesyła go w formacie JSON na serwer
+     * i na podstawie odpowiedzi HTTP określa czy operacja zakończyła się sukcesem
      * @param code kod grupy
-     * @return true jeśli sukces
+     * @return boolean - czy udało się dołączyć do grupy
      */
     public boolean joinGroup(String code) {
 
