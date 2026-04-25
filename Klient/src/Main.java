@@ -44,8 +44,8 @@ public class Main extends Application {
         setupStage(stage);
 
         // WYBIERZ WIDOK STARTOWY:
-        showLogin();
-       // showChats();
+        //showLogin();
+        showChats();
     }
 
     /**

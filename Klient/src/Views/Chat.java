@@ -112,11 +112,17 @@ public class Chat extends GridPane {
         appTitle = new Label("KryptoChat");
         appTitle.getStyleClass().add("title");
 
-        ImageView icon = new ImageView(
-                new Image(getClass().getResource("/settings.png").toExternalForm())
-        );
+        var url = getClass().getResource("/settings.png");
+
+        ImageView icon = new ImageView(new Image(url.toExternalForm()));
         icon.setFitWidth(22);
         icon.setFitHeight(22);
+        icon.setPreserveRatio(true);
+
+        settingsButton = new Button();
+        settingsButton.setGraphic(icon);
+        settingsButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        settingsButton.setStyle("-fx-background-color: transparent;");
 
         settingsButton = new Button();
         settingsButton.setGraphic(icon);

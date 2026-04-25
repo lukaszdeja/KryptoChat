@@ -1,0 +1,55 @@
+.root {
+    -fx-background-color: white;
+}
+
+/* Tytuły */
+.title {
+    -fx-font-size: 28px;
+    -fx-text-fill: #606695;
+    -fx-font-weight: bold;
+}
+
+.subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #9fa8da;
+}
+
+/* Karty */
+.card {
+    -fx-background-color: #f5f6ff;
+    -fx-padding: 20;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #9fa8da;
+    -fx-min-width: 250px;
+}
+
+/* Pola tekstowe */
+.text-field {
+    -fx-pref-width: 200px;
+    -fx-background-radius: 8;
+}
+
+/* Przycisk główny */
+.primary-btn {
+    -fx-background-color: #606695;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-padding: 8 20;
+}
+
+.primary-btn:hover {
+    -fx-background-color: #4f547a;
+}
+
+/* Przycisk drugi */
+.secondary-btn {
+    -fx-background-color: #9fa8da;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-padding: 8 20;
+}
+
+.secondary-btn:hover {
+    -fx-background-color: #8c95c7;
+}
