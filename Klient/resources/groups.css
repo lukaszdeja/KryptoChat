@@ -1,0 +1,35 @@
+.root {
+    -fx-background-color: #d7d4ea;
+}
+
+.top-bar {
+    -fx-background-color: #606695;
+}
+
+.title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-letter-spacing: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 6, 0.3, 0, 2);
+}
+
+.header {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.text-field {
+    -fx-pref-height: 35px;
+    -fx-background-radius: 8px;
+}
+
+.button {
+    -fx-background-color: #606695;
+    -fx-text-fill: white;
+    -fx-background-radius: 8px;
+}
+
+.button:hover {
+    -fx-background-color: derive(#606695, -15%);
+}

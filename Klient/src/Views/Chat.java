@@ -9,7 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import Models.Message;
+
 
 /**
  * Widok aplikacji czatu.
@@ -159,7 +159,7 @@ public class Chat extends GridPane {
 
 
         // CHAT PANE
-        VBox chatPane = new VBox(10, chatList, inputBar);
+        VBox chatPane = new VBox(0, chatList, inputBar);
         VBox.setVgrow(chatList, Priority.ALWAYS);
         chatPane.setFillWidth(true);
 
