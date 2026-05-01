@@ -42,7 +42,7 @@ public class LoginController {
      * Odpowiedź z serwisu i reakcją na nią
      */
     private void handleLogin() {
-        String username = String.valueOf(loginView.getLogin());
+        String username = loginView.getLogin();
         String password = loginView.getPassword();
 
         if (username.isEmpty() || password.isEmpty()) {
