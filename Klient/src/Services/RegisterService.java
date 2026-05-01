@@ -33,12 +33,15 @@ public class RegisterService {
             String json = mapper.writeValueAsString(register);
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://wpiszlink.pl/api/login"))
+                    .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/register"))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            System.out.println("STATUS: " + response.statusCode());
+            System.out.println("BODY: " + response.body());
 
             return response.statusCode() == 200;
         } catch (Exception e) {

@@ -52,7 +52,8 @@ public class Main extends Application {
         // WYBIERZ WIDOK STARTOWY:
         //showLogin();
         // showChats();
-         showCreateGroup();
+         //showCreateGroup();
+        showRegister();
     }
 
     /**

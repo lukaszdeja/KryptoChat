@@ -58,12 +58,7 @@ public class LoginService {
      * @param token - token zapisywany w pliku, przekazany jako String
      */
     private void saveCookie(String token) {
-        try {
-            Files.writeString(Paths.get("token.txt"), token, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        return;
     }
 }
 
