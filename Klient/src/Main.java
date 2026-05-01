@@ -50,9 +50,10 @@ public class Main extends Application {
         setupStage(stage);
 
         // WYBIERZ WIDOK STARTOWY:
-        showLogin();
+        //showLogin();
         //showChats();
          //showCreateGroup();
+        showRegister();
     }
 
     /**
