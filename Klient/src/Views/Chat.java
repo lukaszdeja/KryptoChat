@@ -9,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.application.Platform;
 
 
 /**
@@ -55,7 +56,9 @@ public class Chat extends GridPane {
 
         // wiersze: topbar + content
         RowConstraints topRow = new RowConstraints();
-        topRow.setPrefHeight(60);
+        topRow.setMinHeight(50);
+        topRow.setPrefHeight(Region.USE_COMPUTED_SIZE);
+        topRow.setVgrow(Priority.NEVER);
 
         RowConstraints contentRow = new RowConstraints();
         contentRow.setVgrow(Priority.ALWAYS);
@@ -80,6 +83,16 @@ public class Chat extends GridPane {
         chatList.getSelectionModel().clearSelection();
         chatList.setMouseTransparent(false);
 
+        messages.addListener((javafx.collections.ListChangeListener<Message>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    Platform.runLater(() ->
+                            chatList.scrollTo(messages.size() - 1)
+                    );
+                }
+            }
+        });
+
         chatList.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(Message msg, boolean empty) {
@@ -102,8 +115,6 @@ public class Chat extends GridPane {
         var url = getClass().getResource("/settings.png");
 
         ImageView icon = new ImageView(new Image(url.toExternalForm()));
-        icon.setFitWidth(24);
-        icon.setFitHeight(24);
         icon.setPreserveRatio(true);
 
         settingsButton = new Button();
@@ -118,6 +129,14 @@ public class Chat extends GridPane {
         topBar.setPadding(new Insets(20));
         topBar.getStyleClass().add("top-bar");
 
+        icon.fitHeightProperty().bind(
+                topBar.heightProperty().multiply(0.45)
+        );
+        icon.fitWidthProperty().bind(icon.fitHeightProperty());
+
+        settingsButton.maxHeightProperty().bind(topBar.heightProperty().multiply(0.7));
+        settingsButton.maxWidthProperty().bind(settingsButton.maxHeightProperty());
+
 
         // Pole do wpisywania wiadomości
         messageField = new TextField();
@@ -129,8 +148,6 @@ public class Chat extends GridPane {
         sendButton = new Button();
         var url1 = getClass().getResource("/arrow.png");
         ImageView ikonka = new ImageView(new Image(url1.toExternalForm()));
-        ikonka.setFitWidth(22);
-        ikonka.setFitHeight(22);
         ikonka.setPreserveRatio(true);
 
         sendButton.setGraphic(ikonka);
@@ -142,6 +159,9 @@ public class Chat extends GridPane {
         inputBar.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(inputBar, Priority.ALWAYS);
         inputBar.getStyleClass().add("input-bar");
+
+        ikonka.fitHeightProperty().bind(inputBar.heightProperty().multiply(0.55));
+        ikonka.fitWidthProperty().bind(ikonka.fitHeightProperty());
 
 
         // CHAT PANE
