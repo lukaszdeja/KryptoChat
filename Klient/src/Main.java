@@ -9,6 +9,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import Views.*;
 import Controllers.*;
+import security.TokenStorage;
 
 /** class Main
  * Główna klasa warstwy FrontEnd aplikacji - zbudowana w JavaFx, rozszerza interfejs Application
@@ -53,7 +54,14 @@ public class Main extends Application {
         //showLogin();
         // showChats();
          //showCreateGroup();
-        showRegister();
+        //showRegister();
+
+        String token = TokenStorage.loadToken();
+        if (token != null) {
+            showCreateGroup();
+        } else {
+            showLogin();
+        }
     }
 
     /**

@@ -8,6 +8,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import security.TokenStorage;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +34,7 @@ public class LoginService {
             System.out.println(json);
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://wpiszlink.pl/api/login"))
+                    .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/login"))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(json)).build();
 
@@ -41,25 +42,25 @@ public class LoginService {
             if (response.statusCode() == 200) {
                 String responseBody = response.body();
                 JsonNode node = mapper.readTree(responseBody);
-                String token = node.get("token").asText();
+                JsonNode tokenNode = node.get("userToken");
+
+                if (tokenNode == null) {
+                    System.out.println("No token in response: " + responseBody);
+                    return false;
+                }
+
+                String token = tokenNode.asText();
                 System.out.println("JWT: "+ token);
-                saveCookie(token);
+                TokenStorage.saveToken(token);
                 return true;
             }
+            return false;
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             return true;
         }
-        return true;
     }
 
-    /**
-     * Pomocnicza metoda zapisująca token do pliku tekstowego
-     * @param token - token zapisywany w pliku, przekazany jako String
-     */
-    private void saveCookie(String token) {
-        return;
-    }
 }
 
 
