@@ -67,7 +67,7 @@ public class RegisterController {
             delay.setOnFinished(e -> goToLogin.run());
             delay.play();
         } else {
-            registerView.getLabel().setText("Nie udało się utworzyć konta");
+            registerView.getLabel().setText("Użytkownik z tym loginem juz istnieje");
         }
     }
 
