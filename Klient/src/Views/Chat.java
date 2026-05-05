@@ -28,7 +28,7 @@ public class Chat extends GridPane {
     private ListView<Message> chatList;
     private ObservableList<Message> messages;
     private Label appTitle;
-    private Button settingsButton;
+    private Button logoutButton;
     private final TextField messageField;
     private final Button sendButton;
     private Label groupNameLabel;
@@ -121,20 +121,20 @@ public class Chat extends GridPane {
         appTitle = new Label("KryptoChat");
         appTitle.getStyleClass().add("title");
 
-        var url = getClass().getResource("/settings.png");
+        var url = getClass().getResource("/logout.png");
 
         ImageView icon = new ImageView(new Image(url.toExternalForm()));
         icon.setPreserveRatio(true);
 
-        settingsButton = new Button();
-        settingsButton.setGraphic(icon);
-        settingsButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        settingsButton.setStyle("-fx-background-color: transparent;");
+        logoutButton = new Button();
+        logoutButton.setGraphic(icon);
+        logoutButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        logoutButton.setStyle("-fx-background-color: transparent;");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        HBox topBar = new HBox(10, appTitle, spacer, settingsButton);
+        HBox topBar = new HBox(10, appTitle, spacer, logoutButton);
         topBar.setPadding(new Insets(20));
         topBar.getStyleClass().add("top-bar");
 
@@ -143,8 +143,8 @@ public class Chat extends GridPane {
         );
         icon.fitWidthProperty().bind(icon.fitHeightProperty());
 
-        settingsButton.maxHeightProperty().bind(topBar.heightProperty().multiply(0.7));
-        settingsButton.maxWidthProperty().bind(settingsButton.maxHeightProperty());
+        logoutButton.maxHeightProperty().bind(topBar.heightProperty().multiply(0.7));
+        logoutButton.maxWidthProperty().bind(logoutButton.maxHeightProperty());
 
 
         // Pole do wpisywania wiadomości
@@ -197,6 +197,8 @@ public class Chat extends GridPane {
     public Button getSendButton() {
         return sendButton;
     }
+
+    public Button getLogoutButton() { return  logoutButton; }
 
     public TextField getMessageField() {
         return messageField;

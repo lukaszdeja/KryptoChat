@@ -49,7 +49,7 @@ public class Main extends Application {
         chatService = new ChatService();
         loginController = new LoginController(loginPage, loginService, this::showCreateGroup);
         registerController = new RegisterController(registerPage, registerService, this::showLogin);
-        chatController = new ChatController(chatPage, chatService);
+        chatController = new ChatController(chatPage, chatService, this::showLogin);
         groupController = new GroupController(groupPage, groupService, this::showChats);
         setupStage(stage);
 

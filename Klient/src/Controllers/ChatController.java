@@ -7,6 +7,7 @@ import Models.Message;
 import Models.User;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ListCell;
+import security.TokenStorage;
 
 /**
  * Kontroler obsługujący logikę czatu.
@@ -17,6 +18,7 @@ public class ChatController {
     /** Widok czatu */
     private final Chat chatView;
     private ChatService chatService;
+    private Runnable goToLogin;
 
     Group group;
 
@@ -25,7 +27,7 @@ public class ChatController {
      *
      * @param chat - obiekt widoku czatu
      */
-    public ChatController(Chat chat, ChatService chatService){
+    public ChatController(Chat chat, ChatService chatService, Runnable goToLogin){
         this.chatView = chat;
         this.chatService = chatService;
         init();
@@ -37,6 +39,7 @@ public class ChatController {
     private void init(){
         chatView.getSendButton().setOnAction(e -> handleSend());
         chatView.getMessageField().setOnAction(e -> handleSend());
+        chatView.getLogoutButton().setOnAction(e -> logout());
 
         loadGroup();
         loadMessages();
@@ -50,7 +53,13 @@ public class ChatController {
     }
 
     public void loadMessages() {
+        return;
+    }
 
+    public void logout() {
+        TokenStorage.setUser(null);
+        TokenStorage.deleteToken();
+        goToLogin.run();
     }
 
     /**
