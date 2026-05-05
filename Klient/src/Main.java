@@ -1,3 +1,4 @@
+import Services.ChatService;
 import Services.GroupService;
 import Services.LoginService;
 import Services.RegisterService;
@@ -29,6 +30,7 @@ public class Main extends Application {
     private ChatController chatController;
     private GroupController groupController;
     private GroupService groupService;
+    private ChatService chatService;
 
     /** Metoda start
      * inicjuje widoki logowania oraz rejestracji
@@ -44,28 +46,29 @@ public class Main extends Application {
         loginService = new LoginService();
         registerService = new RegisterService();
         groupService = new GroupService();
+        chatService = new ChatService();
         loginController = new LoginController(loginPage, loginService, this::showCreateGroup);
         registerController = new RegisterController(registerPage, registerService, this::showLogin);
-        chatController = new ChatController(chatPage);
+        chatController = new ChatController(chatPage, chatService);
         groupController = new GroupController(groupPage, groupService, this::showChats);
         setupStage(stage);
 
         // WYBIERZ WIDOK STARTOWY:
         //showLogin();
-        // showChats();
+        showChats();
          //showCreateGroup();
         //showRegister();
 
         TokenStorage.loadUser();
-        if (TokenStorage.getUser() != null) {
-            if (TokenStorage.getUser().getGroupId() == null) {
-                showCreateGroup();
-            } else {
-                showChats();
-            }
-        } else {
-            showLogin();
-        }
+       // if (TokenStorage.getUser() != null) {
+         //   if (TokenStorage.getUser().getGroupId() == null) {
+           //     showCreateGroup();
+            //} else {
+              //  showChats();
+           // }
+        //} else {
+          //  showLogin();
+        //}
     }
 
     /**
