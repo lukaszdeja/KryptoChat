@@ -12,6 +12,7 @@ import security.TokenStorage;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import Models.User;
 
 
 
@@ -41,17 +42,19 @@ public class LoginService {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
                 String responseBody = response.body();
+                System.out.println("RB" + responseBody);
                 JsonNode node = mapper.readTree(responseBody);
                 JsonNode tokenNode = node.get("userToken");
-
                 if (tokenNode == null) {
                     System.out.println("No token in response: " + responseBody);
                     return false;
                 }
+                System.out.println(tokenNode);
+                User user = mapper.treeToValue(node.get("userToken"), User.class);
+                System.out.println(user);
+                TokenStorage.setUser(user);
 
-                String token = tokenNode.asText();
-                System.out.println("JWT: "+ token);
-                TokenStorage.saveToken(token);
+                TokenStorage.saveToken(tokenNode.toString());
                 return true;
             }
             return false;

@@ -44,16 +44,20 @@ public class Main extends Application {
         loginService = new LoginService();
         registerService = new RegisterService();
         groupService = new GroupService();
-        loginController = new LoginController(loginPage, loginService, this::showChats);
+        loginController = new LoginController(loginPage, loginService, this::showCreateGroup);
         registerController = new RegisterController(registerPage, registerService, this::showLogin);
         chatController = new ChatController(chatPage);
         groupController = new GroupController(groupPage, groupService, this::showChats);
         setupStage(stage);
         
 
-        String token = TokenStorage.loadToken();
-        if (token != null) {
-            showCreateGroup();
+        TokenStorage.loadUser();
+        if (TokenStorage.getUser() != null) {
+            if (TokenStorage.getUser().getGroupId() == null) {
+                showCreateGroup();
+            } else {
+                showChats();
+            }
         } else {
             showLogin();
         }

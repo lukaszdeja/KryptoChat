@@ -68,8 +68,8 @@ public class Chat extends GridPane {
         // Użytkownicy
         userList = new ListView<>();
         userList.getItems().addAll(
-                new User(1, "Ania", 1),
-                new User(2, "Kasia", 1)
+                new User(1L, "Ania", 1L),
+                new User(2L, "Kasia", 1L)
         );
         userList.setMinHeight(30);
         userList.getStyleClass().add("user-list");

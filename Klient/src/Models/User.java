@@ -6,13 +6,13 @@ package Models;
 public class User {
 
     /** Unikalny identyfikator użytkownika */
-    private final int id;
+    private Long id;
 
     /** Nazwa użytkownika */
-    private final String username;
+    private String username;
 
     /** Identyfikator grupy, do której należy użytkownik */
-    private int groupId;
+    private Long groupId;
 
     /**
      * Konstruktor klasy User.
@@ -21,17 +21,23 @@ public class User {
      * @param username - nazwa użytkownika
      * @param groupId - identyfikator grupy użytkownika
      */
-    public User(int id, String username, int groupId) {
+    public User(Long id, String username, Long groupId) {
         this.id = id;
         this.username = username;
         this.groupId = groupId;
     }
 
+    public User() {}
+
     /**
      * Zwraca identyfikator użytkownika.
      */
-    public int getId() {
+    public Long getId() {
         return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     /**
@@ -41,17 +47,21 @@ public class User {
         return this.username;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     /**
      * Zwraca identyfikator(id) grupy użytkownika.
      */
-    public int getGroupId() {
+    public Long getGroupId() {
         return this.groupId;
     }
 
     /**
      * Ustawia identyfikator grupy użytkownika (groupId).
      */
-    public void setGroupId(int groupId) {
+    public void setGroupId(Long groupId) {
         this.groupId = groupId;
     }
 
