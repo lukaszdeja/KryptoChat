@@ -43,9 +43,9 @@ public class ChatController {
         if (text == null || text.isEmpty()) return;
 
         if (user == null) {
-            chatView.getMessages().add(new Message(new User(0, "System", 0), "Wybierz użytkownika!"));
+            chatView.getMessages().add(new Message(new User(0L, "System", 0L), "Wybierz użytkownika!"));
         } else {
-            chatView.getMessages().add(new Message(new User(0, "Ja", 0), text)); //tu trzeba wstawic zalogowanego uzytkownika
+            chatView.getMessages().add(new Message(new User(0L, "Ja", 0L), text)); //tu trzeba wstawic zalogowanego uzytkownika
         }
 
         chatView.getMessageField().clear();
