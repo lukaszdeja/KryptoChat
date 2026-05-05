@@ -1,10 +1,12 @@
 package Views;
 
-import Models.User;
+import Models.Group;
 import Models.Message;
+import Models.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.image.Image;
@@ -26,9 +28,11 @@ public class Chat extends GridPane {
     private ListView<Message> chatList;
     private ObservableList<Message> messages;
     private Label appTitle;
-    private Button settingsButton;
+    private Button logoutButton;
     private final TextField messageField;
     private final Button sendButton;
+    private Label groupNameLabel;
+    private Label groupCodeLabel;
 
     /** Pasek wpisywania wiadomości */
     private final HBox inputBar;
@@ -66,14 +70,19 @@ public class Chat extends GridPane {
         getRowConstraints().addAll(topRow, contentRow);
 
         // Użytkownicy
+        groupNameLabel = new Label("");
+        groupCodeLabel = new Label("Kod dolaczenia:");
+        HBox labele = new HBox(0, groupNameLabel, groupCodeLabel);
         userList = new ListView<>();
-        userList.getItems().addAll(
-                new User(1L, "Ania", 1L),
-                new User(2L, "Kasia", 1L)
-        );
         userList.setMinHeight(30);
         userList.getStyleClass().add("user-list");
+        groupCodeLabel.setPrefWidth(170);
+        groupCodeLabel.setAlignment(Pos.CENTER_RIGHT);
 
+        VBox userBox = new VBox(0, labele, userList);
+        userBox.getStyleClass().add("user-list");
+        groupNameLabel.getStyleClass().add("group-name-label");
+        groupCodeLabel.getStyleClass().add("group-name-label");
 
         // Wiadomości
         messages = FXCollections.observableArrayList();
@@ -112,20 +121,20 @@ public class Chat extends GridPane {
         appTitle = new Label("KryptoChat");
         appTitle.getStyleClass().add("title");
 
-        var url = getClass().getResource("/settings.png");
+        var url = getClass().getResource("/logout.png");
 
         ImageView icon = new ImageView(new Image(url.toExternalForm()));
         icon.setPreserveRatio(true);
 
-        settingsButton = new Button();
-        settingsButton.setGraphic(icon);
-        settingsButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        settingsButton.setStyle("-fx-background-color: transparent;");
+        logoutButton = new Button();
+        logoutButton.setGraphic(icon);
+        logoutButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        logoutButton.setStyle("-fx-background-color: transparent;");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        HBox topBar = new HBox(10, appTitle, spacer, settingsButton);
+        HBox topBar = new HBox(10, appTitle, spacer, logoutButton);
         topBar.setPadding(new Insets(20));
         topBar.getStyleClass().add("top-bar");
 
@@ -134,8 +143,8 @@ public class Chat extends GridPane {
         );
         icon.fitWidthProperty().bind(icon.fitHeightProperty());
 
-        settingsButton.maxHeightProperty().bind(topBar.heightProperty().multiply(0.7));
-        settingsButton.maxWidthProperty().bind(settingsButton.maxHeightProperty());
+        logoutButton.maxHeightProperty().bind(topBar.heightProperty().multiply(0.7));
+        logoutButton.maxWidthProperty().bind(logoutButton.maxHeightProperty());
 
 
         // Pole do wpisywania wiadomości
@@ -172,7 +181,7 @@ public class Chat extends GridPane {
 
         // GRID LAYOUT
         add(topBar, 0, 0, 2, 1);
-        add(userList, 0, 1);
+        add(userBox, 0, 1);
         add(chatPane, 1, 1);
         messageField.setMaxWidth(Double.MAX_VALUE);
         inputBar.setMaxWidth(Double.MAX_VALUE);
@@ -189,6 +198,8 @@ public class Chat extends GridPane {
         return sendButton;
     }
 
+    public Button getLogoutButton() { return  logoutButton; }
+
     public TextField getMessageField() {
         return messageField;
     }
@@ -204,4 +215,8 @@ public class Chat extends GridPane {
     public GridPane getView() {
         return this;
     }
+
+    public Label getGroupNameLabel() { return groupNameLabel; }
+
+    public Label getGroupCodeLabel() { return groupCodeLabel; }
 }

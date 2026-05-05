@@ -6,6 +6,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import security.TokenStorage;
 
 /**
  * Klasa obsługująca operacje związane z grupami (tworzenie oraz dołączanie).
@@ -29,11 +30,16 @@ public class GroupService {
         try {
             GroupRequest requestBody = new GroupRequest();
             requestBody.setGroupName(groupName);
+            requestBody.setUser(TokenStorage.getUser());
+
+            if ( TokenStorage.getUser().getGroupId() != null ){
+                return false;
+            }
 
             String json = mapper.writeValueAsString(requestBody);
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://wpiszlink.pl/api/creategroup"))
+                    .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/groups/create"))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
@@ -45,7 +51,7 @@ public class GroupService {
             e.printStackTrace();
         }
 
-        return true; //domyslnie false
+        return false;
     }
 
     /**
@@ -60,11 +66,16 @@ public class GroupService {
         try {
             GroupRequest requestBody = new GroupRequest();
             requestBody.setCode(code);
+            requestBody.setUser(TokenStorage.getUser());
+
+            if ( TokenStorage.getUser().getGroupId() != null ){
+                return false;
+            }
 
             String json = mapper.writeValueAsString(requestBody);
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://wpiszlink.pl/api/joingroup"))
+                    .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/groups/join"))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
@@ -75,7 +86,8 @@ public class GroupService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        //obsluga komunikatu czy sie udalo czy nie w obu
 
-        return true; //domyslnie false
+        return false;
     }
 }

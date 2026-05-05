@@ -1,5 +1,7 @@
 package Services;
 
+import Models.User;
+
 /**
  * Klasa potrzebna do tworzenia obiektów requestów związanych z grupami,
  * które mogą być serializowane do formatu JSON (np. do wysłania do backendu)
@@ -11,6 +13,7 @@ package Services;
  */
 public class GroupRequest {
 
+    private User user;
     private String groupName;
     private String code;
     public GroupRequest() {}
@@ -22,6 +25,7 @@ public class GroupRequest {
     public void setCode(String code) {
         this.code = code;
     }
+    public void setUser(User user) { this.user = user; }
 
     // Gettery
     public String getGroupName() {
@@ -30,4 +34,5 @@ public class GroupRequest {
     public String getCode() {
         return code;
     }
+    public User getUser() { return this.user; }
 }

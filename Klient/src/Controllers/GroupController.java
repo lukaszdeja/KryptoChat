@@ -54,6 +54,11 @@ public class GroupController {
             return;
         }
 
+        if (groupName.length() > 20) {
+            groupView.getMessage().setText("Nazwa grupy nie może mieć więcej niż 20 znaków");
+            return;
+        }
+
         boolean success = groupService.createGroup(groupName);
 
         if(success) {
