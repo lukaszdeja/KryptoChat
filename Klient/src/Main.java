@@ -49,12 +49,7 @@ public class Main extends Application {
         chatController = new ChatController(chatPage);
         groupController = new GroupController(groupPage, groupService, this::showChats);
         setupStage(stage);
-
-        // WYBIERZ WIDOK STARTOWY:
-        //showLogin();
-        //showChats();
-         //showCreateGroup();
-        //showRegister();
+        
 
         String token = TokenStorage.loadToken();
         if (token != null) {

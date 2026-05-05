@@ -7,10 +7,7 @@ import java.nio.file.Paths;
 public class TokenStorage {
 
     private static final Path FILE = Paths.get(
-            System.getProperty("user.home"),
-            ".KryptoChatapp",
-            "token.dat"
-    );
+            System.getProperty("user.home"), ".KryptoChatapp", "token.dat");
 
     // ===== SAVE TOKEN =====
     public static void saveToken(String token) {
