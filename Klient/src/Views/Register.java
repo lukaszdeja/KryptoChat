@@ -63,19 +63,19 @@ public class Register {
      * Publiczna metoda zwracająca tekst z pola username
      * @return String - tekst z pola loginu
      */
-    public String getLogin() { return username.getText(); }
+    public TextField getLogin() { return username; }
 
     /**
      * Publiczna metoda zwracająca tekst z pola password
      * @return String - tekst z pola hasła
      */
-    public String getPassword() { return password.getText(); }
+    public PasswordField getPassword() { return password; }
 
     /**
      * Publiczna metoda zwracająca tekst z pola password2
      * @return String - tekst z pola powtórz hasło
      */
-    public String getPassword2() { return password2.getText();}
+    public PasswordField getPassword2() { return password2;}
 
     /**
      * Metoda zwracająca referencję do obiektu przycisku

@@ -5,7 +5,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import security.TokenStorage;
 
 /**
  * Klasa obsługująca operacje związane z grupami (tworzenie oraz dołączanie).
@@ -27,25 +30,31 @@ public class GroupService {
     public boolean createGroup(String groupName) {
 
         try {
-            GroupRequest requestBody = new GroupRequest();
+            CreateGroupRequest requestBody = new CreateGroupRequest();
             requestBody.setGroupName(groupName);
+            requestBody.setUsername(TokenStorage.getUser().getUsername());
 
             String json = mapper.writeValueAsString(requestBody);
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://wpiszlink.pl/api/creategroup"))
+                    .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/groups/create"))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response.body());
+            System.out.println(response.statusCode());
 
-            return response.statusCode() == 200;
+            if (response.statusCode() == 200) {
+                return this.saveResponse(response);
+            }
+            return false;
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return true; //domyslnie false
+        return false; //domyslnie false
     }
 
     /**
@@ -58,24 +67,50 @@ public class GroupService {
     public boolean joinGroup(String code) {
 
         try {
-            GroupRequest requestBody = new GroupRequest();
+            JoinGroupRequest requestBody = new JoinGroupRequest();
             requestBody.setCode(code);
+            requestBody.setUsername(TokenStorage.getUser().getUsername());
 
             String json = mapper.writeValueAsString(requestBody);
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://wpiszlink.pl/api/joingroup"))
+                    .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/groups/join"))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            return response.statusCode() == 200;
+            if (response.statusCode() == 200) {
+                return this.saveResponse(response);
+            }
+            return false;
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return true; //domyslnie false
+        return false; //domyslnie false
+    }
+
+    private boolean saveResponse(HttpResponse<String> response) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode node = mapper.readTree(response.body());
+            Long groupId = node.get("groupId").asLong();
+            System.out.println(groupId);
+            if (groupId != null) {
+                TokenStorage.getUser().setGroupId(groupId);
+                TokenStorage.deleteToken();
+                String storeUser = mapper.writeValueAsString(TokenStorage.getUser());
+                TokenStorage.saveToken(storeUser);
+                return true;
+            } else {
+                System.out.println("Nie udalo sie zapisac");
+                return false;
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

@@ -30,6 +30,7 @@ public class ChatController {
     public ChatController(Chat chat, ChatService chatService, Runnable goToLogin){
         this.chatView = chat;
         this.chatService = chatService;
+        this.goToLogin = goToLogin;
         init();
     }
 

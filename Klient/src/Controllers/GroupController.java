@@ -70,6 +70,8 @@ public class GroupController {
         else {
             groupView.getMessage().setText("Zbyt krótka nazwa grupy (min. 3 znaki)");
         }
+        groupView.getGroupNameField().setText("");
+        groupView.getCodeField().setText("");
     }
 
     /**
@@ -98,5 +100,7 @@ public class GroupController {
         else {
             groupView.getMessage().setText("Niepoprawny kod grupy");
         }
+        groupView.getGroupNameField().setText("");
+        groupView.getCodeField().setText("");
     }
 }

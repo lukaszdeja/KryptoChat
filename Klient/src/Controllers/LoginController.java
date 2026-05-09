@@ -4,6 +4,7 @@ import Services.LoginService;
 import Views.Login;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
+import security.TokenStorage;
 
 
 /**
@@ -13,6 +14,7 @@ public class LoginController {
     private Login loginView;
     private LoginService logservice;
     Runnable goToGroups;
+    Runnable goToChats;
 
     /**
      * Konstruktor klasy, inicjuje pola klasy i wywoluje metode init()
@@ -20,10 +22,11 @@ public class LoginController {
      * @param service - obiekt serwisu logowania
      * @param goToGroups - callback do funkcji przelaczajacej widok na okno czatu
      */
-    public LoginController(Login view, LoginService service, Runnable goToGroups)  {
+    public LoginController(Login view, LoginService service, Runnable goToGroups, Runnable goToChats)  {
         this.loginView = view;
         this.logservice = service;
         this.goToGroups = goToGroups;
+        this.goToChats = goToChats;
         init();
     }
 
@@ -42,8 +45,8 @@ public class LoginController {
      * Odpowiedź z serwisu i reakcją na nią
      */
     private void handleLogin() {
-        String username = loginView.getLogin();
-        String password = loginView.getPassword();
+        String username = loginView.getLogin().getText();
+        String password = loginView.getPassword().getText();
 
         if (username.isEmpty() || password.isEmpty()) {
            loginView.getLabel().setText("Pola nie mogą być puste!");
@@ -53,12 +56,20 @@ public class LoginController {
         boolean success = logservice.login(username, password);
         if (success) {
             loginView.getLabel().setText("Zalogowano!");
-            PauseTransition delay = new PauseTransition(Duration.seconds(2));
-            delay.setOnFinished(e -> goToGroups.run());
-            delay.play();
+            if (TokenStorage.getUser().getGroupId() != null) {
+                PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                delay.setOnFinished(e -> goToChats.run());
+                delay.play();
+            } else {
+                PauseTransition delay = new PauseTransition(Duration.seconds(2));
+                delay.setOnFinished(e -> goToGroups.run());
+                delay.play();
+            }
 
         } else {
             loginView.getLabel().setText("Wyjątek przez połączenie z serwerem");
         }
+        loginView.getLogin().setText("");
+        loginView.getPassword().setText("");
     }
 }
