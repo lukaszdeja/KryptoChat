@@ -22,16 +22,21 @@ public class RegisterService {
      * @param username nazwa uzytkownika
      * @param password haslo
      * @param password2 powtorzone haslo
-     * @return boolean - czy udalo sie zarejestrować użytkownika
+     * @return ServiceResponse - obiekt zawierający bool czy sie udało zarejestrować i string z komunikatem
      */
-    public boolean login(String username, String password, String password2) {
+    public ServiceResponse register(String username, String password, String password2) {
+
         RegisterRequest register = new RegisterRequest();
+
         register.setUsername(username);
         register.setPassword(password);
+
         try {
+
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(register);
             HttpClient client = HttpClient.newHttpClient();
+
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/register"))
                     .header("Content-Type", "application/json")
@@ -39,15 +44,23 @@ public class RegisterService {
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            //System.out.println("Status: " + response.statusCode());
 
-            System.out.println("STATUS: " + response.statusCode());
-            System.out.println("BODY: " + response.body());
+            if(response.statusCode() == 200) {
+                return new ServiceResponse(true, "Utworzono konto");
+            }
 
-            return response.statusCode() == 200;
+            if(response.statusCode() == 500) {
+                return new ServiceResponse(false, "Użytkownik już istnieje");
+            }
+
+            return new ServiceResponse(false, "Błąd rejestracji");
+
         } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        return false;
+            e.printStackTrace();
+
+            return new ServiceResponse(false, "Brak połączenia z serwerem");
+        }
     }
 }

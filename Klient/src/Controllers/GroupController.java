@@ -1,5 +1,6 @@
 package Controllers;
 
+import Services.ServiceResponse;
 import Views.CreateGroup;
 import Services.GroupService;
 import javafx.animation.PauseTransition;
@@ -49,7 +50,7 @@ public class GroupController {
     private void createGroup() {
         String groupName = groupView.getGroupNameField().getText();
 
-        if(groupName.isBlank()) {
+        if (groupName.isBlank()) {
             groupView.getMessage().setText("Nazwa grupy nie może być pusta");
             return;
         }
@@ -59,19 +60,26 @@ public class GroupController {
             return;
         }
 
-        boolean success = groupService.createGroup(groupName);
+        if (groupName.length() <= 3) {
+            groupView.getMessage().setText("Nazwa grupy musi mieć conajmniej 3 znaki");
+            return;
+        }
 
-        if(success) {
-            groupView.getMessage().setText("Utworzono grupe");
-            PauseTransition delay = new PauseTransition(Duration.seconds(2));
+        ServiceResponse response = groupService.createGroup(groupName);
+
+        groupView.getMessage().setText(response.getMessage());
+
+        if (response.isSuccess()) {
+
+            PauseTransition delay =
+                    new PauseTransition(Duration.seconds(2));
+
             delay.setOnFinished(e -> goToChats.run());
+
             delay.play();
         }
-        else {
-            groupView.getMessage().setText("Zbyt krótka nazwa grupy (min. 3 znaki)");
-        }
-        groupView.getGroupNameField().setText("");
-        groupView.getCodeField().setText("");
+
+        clearFields();
     }
 
     /**
@@ -84,22 +92,29 @@ public class GroupController {
     private void joinGroup() {
         String code = groupView.getCodeField().getText();
 
-        if(code.isBlank()) {
+        if (code.isBlank()) {
             groupView.getMessage().setText("Kod grupy nie może być pusty");
             return;
         }
 
-        boolean success = groupService.joinGroup(code);
+        ServiceResponse response = groupService.joinGroup(code);
 
-        if(success) {
-            groupView.getMessage().setText("Dołączono do grupy");
+        groupView.getMessage().setText(response.getMessage());
+
+        if (response.isSuccess()) {
+
             PauseTransition delay = new PauseTransition(Duration.seconds(2));
+
             delay.setOnFinished(e -> goToChats.run());
+
             delay.play();
         }
-        else {
-            groupView.getMessage().setText("Niepoprawny kod grupy");
-        }
+
+        clearFields();
+    }
+
+    private void clearFields() {
+
         groupView.getGroupNameField().setText("");
         groupView.getCodeField().setText("");
     }

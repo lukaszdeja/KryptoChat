@@ -1,6 +1,7 @@
 package Controllers;
 
 import Services.LoginService;
+import Services.ServiceResponse;
 import Views.Login;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
@@ -49,27 +50,23 @@ public class LoginController {
         String password = loginView.getPassword().getText();
 
         if (username.isEmpty() || password.isEmpty()) {
-           loginView.getLabel().setText("Pola nie mogą być puste!");
+            loginView.getLabel().setText("Pola nie mogą być puste!");
             return;
         }
 
-        boolean success = logservice.login(username, password);
-        if (success) {
-            loginView.getLabel().setText("Zalogowano!");
+        ServiceResponse response = logservice.login(username, password);
+        loginView.getLabel().setText(response.getMessage());
+
+        if (response.isSuccess()) {
+            PauseTransition delay = new PauseTransition(Duration.seconds(2));
+
             if (TokenStorage.getUser().getGroupId() != null) {
-                PauseTransition delay = new PauseTransition(Duration.seconds(2));
                 delay.setOnFinished(e -> goToChats.run());
                 delay.play();
             } else {
-                PauseTransition delay = new PauseTransition(Duration.seconds(2));
                 delay.setOnFinished(e -> goToGroups.run());
                 delay.play();
             }
-
-        } else {
-            loginView.getLabel().setText("Wyjątek przez połączenie z serwerem");
         }
-        loginView.getLogin().setText("");
-        loginView.getPassword().setText("");
     }
 }

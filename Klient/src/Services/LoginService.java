@@ -23,40 +23,56 @@ public class LoginService {
      * zapisuje token JWT w pliku tekstowym ("ciasteczku")
      * @param username podany login
      * @param password podane hasło
-     * @return boolean - czy sie udalo zalogowac
+     * @return ServiceResponse - obiekt zawierający bool czy sie udało zalogować i string z komunikatem
      */
-    public boolean login(String username, String password) {
+    public ServiceResponse login(String username, String password) {
         try {
             LoginRequest loginRequest = new LoginRequest();
             ObjectMapper mapper = new ObjectMapper();
+
             loginRequest.setUsername(username);
             loginRequest.setPassword(password);
+
             String json = mapper.writeValueAsString(loginRequest);
+
             HttpClient client = HttpClient.newHttpClient();
+
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/login"))
                     .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(json)).build();
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200) {
-                String responseBody = response.body();
-                JsonNode node = mapper.readTree(responseBody);
-                JsonNode tokenNode = node.get("userToken");
-                if (tokenNode == null) {
-                    System.out.println("No token in response: " + responseBody);
-                    return false;
-                }
-                User user = mapper.treeToValue(node.get("userToken"), User.class);
-                TokenStorage.setUser(user);
+            //System.out.println("Status: " + response.statusCode());
 
-                TokenStorage.saveToken(tokenNode.toString());
-                return true;
+            if ( response.statusCode() == 500 ) {
+                return new ServiceResponse(false, "Niepoprawny login lub hasło");
             }
-            return false;
+
+            if (response.statusCode() == 200) {
+
+                JsonNode node = mapper.readTree(response.body());
+                JsonNode tokenNode = node.get("userToken");
+
+                if (tokenNode == null) {
+                    return new ServiceResponse(false, "Błąd serwera - brak tokenu");
+                }
+
+                User user = mapper.treeToValue(tokenNode, User.class);
+
+                TokenStorage.setUser(user);
+                TokenStorage.saveToken(tokenNode.toString());
+
+                return new ServiceResponse(true, "Zalogowano pomyślnie");
+            }
+
+            return new ServiceResponse(false, "Błąd serwera");
+
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-            return true;
+
+            return new ServiceResponse(false, "Brak połączenia z serwerem");
         }
     }
 

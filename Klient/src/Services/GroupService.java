@@ -24,10 +24,11 @@ public class GroupService {
      * Metoda obsługująca tworzenie grupy
      * Metoda tworzy obiekt requesta, przesyła go w formacie JSON na serwer
      * i na podstawie odpowiedzi HTTP określa czy operacja zakończyła się sukcesem
+     *
      * @param groupName nazwa tworzonej grupy
-     * @return boolean - czy udało się utworzyć grupę
+     * @return ServiceResponse zawierający boolean czy się udało stworzyć grupe wraz z komunikatem
      */
-    public boolean createGroup(String groupName) {
+    public ServiceResponse createGroup(String groupName) {
 
         try {
             CreateGroupRequest requestBody = new CreateGroupRequest();
@@ -43,28 +44,29 @@ public class GroupService {
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response.body());
-            System.out.println(response.statusCode());
+            switch (response.statusCode()) {
 
-            if (response.statusCode() == 200) {
-                return this.saveResponse(response);
+                case 200:
+                    return new ServiceResponse(saveResponse(response), "Utworzono grupę");
+
+                default:
+                    return new ServiceResponse(false, "Błąd serwera");
             }
-            return false;
         } catch (Exception e) {
             e.printStackTrace();
+            return new ServiceResponse(false, "Brak połączenia z serwerem");
         }
-
-        return false;
     }
 
     /**
      * Metoda obsługująca dołączanie do grupy
      * Metoda tworzy obiekt requesta, przesyła go w formacie JSON na serwer
      * i na podstawie odpowiedzi HTTP określa czy operacja zakończyła się sukcesem
+     *
      * @param code kod grupy
-     * @return boolean - czy udało się dołączyć do grupy
+     * @return ServiceResponse zawierający boolean czy się udało dołączyć do grupy wraz z komunikatem
      */
-    public boolean joinGroup(String code) {
+    public ServiceResponse joinGroup(String code) {
 
         try {
             JoinGroupRequest requestBody = new JoinGroupRequest();
@@ -80,17 +82,26 @@ public class GroupService {
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println("Status: " + response.statusCode());
 
-            if (response.statusCode() == 200) {
-                return this.saveResponse(response);
+            switch (response.statusCode()) {
+
+                case 200:
+                    return new ServiceResponse(saveResponse(response), "Dołączono do grupy");
+
+                case 500:
+                    return new ServiceResponse(false, "Nie znaleziono grupy");
+
+                default:
+                    return new ServiceResponse(false, "Błąd serwera");
             }
-            return false;
         } catch (Exception e) {
             e.printStackTrace();
+            return new ServiceResponse(false, "Brak połączenia z serwerem");
         }
 
-        return false;
     }
+
 
     private boolean saveResponse(HttpResponse<String> response) {
         try {
@@ -105,7 +116,7 @@ public class GroupService {
                 TokenStorage.saveToken(storeUser);
                 return true;
             } else {
-                System.out.println("Nie udalo sie zapisac");
+                //System.out.println("Nie udalo sie zapisac");
                 return false;
             }
         } catch (JsonProcessingException e) {

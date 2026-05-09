@@ -1,6 +1,7 @@
 package Controllers;
 
 import Services.RegisterService;
+import Services.ServiceResponse;
 import Views.Register;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
@@ -60,18 +61,17 @@ public class RegisterController {
             return;
         }
 
-        boolean success = service.login(username, password, password2);
-        if (success) {
-            registerView.getLabel().setText("Utworzono konto");
+        ServiceResponse response = service.register(username, password, password2);
+
+        registerView.getLabel().setText(response.getMessage());
+
+        if(response.isSuccess()) {
+
             PauseTransition delay = new PauseTransition(Duration.seconds(2));
+
             delay.setOnFinished(e -> goToLogin.run());
             delay.play();
-        } else {
-            registerView.getLabel().setText("Użytkownik z tym loginem juz istnieje");
         }
-        registerView.getLogin().setText("");
-        registerView.getPassword().setText("");
-        registerView.getPassword2().setText("");
     }
 
     /**
