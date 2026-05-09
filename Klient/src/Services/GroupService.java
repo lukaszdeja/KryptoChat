@@ -5,6 +5,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import security.TokenStorage;
 
@@ -28,13 +30,9 @@ public class GroupService {
     public boolean createGroup(String groupName) {
 
         try {
-            GroupRequest requestBody = new GroupRequest();
+            CreateGroupRequest requestBody = new CreateGroupRequest();
             requestBody.setGroupName(groupName);
-            requestBody.setUser(TokenStorage.getUser());
-
-            if ( TokenStorage.getUser().getGroupId() != null ){
-                return false;
-            }
+            requestBody.setUsername(TokenStorage.getUser().getUsername());
 
             String json = mapper.writeValueAsString(requestBody);
 
@@ -45,8 +43,13 @@ public class GroupService {
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response.body());
+            System.out.println(response.statusCode());
 
-            return response.statusCode() == 200;
+            if (response.statusCode() == 200) {
+                return this.saveResponse(response);
+            }
+            return false;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -64,13 +67,9 @@ public class GroupService {
     public boolean joinGroup(String code) {
 
         try {
-            GroupRequest requestBody = new GroupRequest();
+            JoinGroupRequest requestBody = new JoinGroupRequest();
             requestBody.setCode(code);
-            requestBody.setUser(TokenStorage.getUser());
-
-            if ( TokenStorage.getUser().getGroupId() != null ){
-                return false;
-            }
+            requestBody.setUsername(TokenStorage.getUser().getUsername());
 
             String json = mapper.writeValueAsString(requestBody);
 
@@ -82,12 +81,36 @@ public class GroupService {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            return response.statusCode() == 200;
+            if (response.statusCode() == 200) {
+                return this.saveResponse(response);
+            }
+            return false;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //obsluga komunikatu czy sie udalo czy nie w obu
 
+        return false;
+    }
+
+    private boolean saveResponse(HttpResponse<String> response) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode node = mapper.readTree(response.body());
+            Long groupId = node.get("groupId").asLong();
+            System.out.println(groupId);
+            if (groupId != null) {
+                TokenStorage.getUser().setGroupId(groupId);
+                TokenStorage.deleteToken();
+                String storeUser = mapper.writeValueAsString(TokenStorage.getUser());
+                TokenStorage.saveToken(storeUser);
+                return true;
+            } else {
+                System.out.println("Nie udalo sie zapisac");
+                return false;
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 }

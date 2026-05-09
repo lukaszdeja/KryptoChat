@@ -47,12 +47,11 @@ public class Main extends Application {
         registerService = new RegisterService();
         groupService = new GroupService();
         chatService = new ChatService();
-        loginController = new LoginController(loginPage, loginService, this::showCreateGroup);
+        loginController = new LoginController(loginPage, loginService, this::showCreateGroup, this::showChats);
         registerController = new RegisterController(registerPage, registerService, this::showLogin);
         chatController = new ChatController(chatPage, chatService, this::showLogin);
         groupController = new GroupController(groupPage, groupService, this::showChats);
         setupStage(stage);
-
 
         // WYBIERZ WIDOK STARTOWY:
         //showLogin();
@@ -61,7 +60,7 @@ public class Main extends Application {
         //showRegister();
 
         TokenStorage.loadUser();
-        if (TokenStorage.getUser() != null) {
+       if (TokenStorage.getUser() != null) {
             if (TokenStorage.getUser().getGroupId() == null) {
                 showCreateGroup();
             } else {
@@ -69,7 +68,7 @@ public class Main extends Application {
             }
         } else {
             showLogin();
-        }
+       }
     }
 
     /**

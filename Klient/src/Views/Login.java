@@ -61,13 +61,13 @@ public class Login {
      * Publiczna metoda zwracająca tekst z pola username
      * @return String - tekst z pola loginu
      */
-    public String getLogin() { return username.getText(); }
+    public TextField getLogin() { return username; }
 
     /**
      * Publiczna metoda zwracająca tekst z pola password
      * @return String - tekst z pola hasła
      */
-    public String getPassword() { return password.getText(); }
+    public PasswordField getPassword() { return password; }
 
     /**
      * Metoda zwracająca referencję do obiektu przycisku

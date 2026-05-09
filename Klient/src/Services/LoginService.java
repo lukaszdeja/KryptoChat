@@ -32,7 +32,6 @@ public class LoginService {
             loginRequest.setUsername(username);
             loginRequest.setPassword(password);
             String json = mapper.writeValueAsString(loginRequest);
-            System.out.println(json);
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/login"))
@@ -42,16 +41,13 @@ public class LoginService {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
                 String responseBody = response.body();
-                System.out.println("RB" + responseBody);
                 JsonNode node = mapper.readTree(responseBody);
                 JsonNode tokenNode = node.get("userToken");
                 if (tokenNode == null) {
                     System.out.println("No token in response: " + responseBody);
                     return false;
                 }
-                System.out.println(tokenNode);
                 User user = mapper.treeToValue(node.get("userToken"), User.class);
-                System.out.println(user);
                 TokenStorage.setUser(user);
 
                 TokenStorage.saveToken(tokenNode.toString());

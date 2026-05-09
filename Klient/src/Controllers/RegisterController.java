@@ -43,9 +43,9 @@ public class RegisterController {
      * Odpowiedź z serwisu - reakcja na nią
      */
     private void handleLogin() {
-        String username = String.valueOf(registerView.getLogin());
-        String password = registerView.getPassword();
-        String password2 = registerView.getPassword2();
+        String username = registerView.getLogin().getText();
+        String password = registerView.getPassword().getText();
+        String password2 = registerView.getPassword2().getText();
         if (username.isEmpty() || password.isEmpty() || password2.isEmpty()) {
             registerView.getLabel().setText("Pola nie mogą być puste!");
             return;
@@ -69,6 +69,9 @@ public class RegisterController {
         } else {
             registerView.getLabel().setText("Użytkownik z tym loginem juz istnieje");
         }
+        registerView.getLogin().setText("");
+        registerView.getPassword().setText("");
+        registerView.getPassword2().setText("");
     }
 
     /**
