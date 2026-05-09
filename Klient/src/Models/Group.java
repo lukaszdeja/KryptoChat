@@ -46,6 +46,8 @@ public class Group {
         return this.groupName;
     }
 
+    public void setUsers(List<User> users) { this.users = users; }
+
     /**
      * Ustawia nową nazwę grupy.
      *

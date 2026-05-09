@@ -47,9 +47,14 @@ public class ChatController {
     }
 
     public void loadGroup() {
-        group = chatService.loadUsers();
+        group = chatService.loadGroup();
+
+        if(group == null) { return;}
+
         chatView.getGroupNameLabel().setText(group.getGroupName());
+
         chatView.getGroupCodeLabel().setText(group.getCode());
+
         chatView.getUserList().setItems(FXCollections.observableArrayList(group.getUsers()));
     }
 

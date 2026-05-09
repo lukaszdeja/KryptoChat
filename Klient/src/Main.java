@@ -49,7 +49,6 @@ public class Main extends Application {
         chatService = new ChatService();
         loginController = new LoginController(loginPage, loginService, this::showCreateGroup, this::showChats);
         registerController = new RegisterController(registerPage, registerService, this::showLogin);
-        chatController = new ChatController(chatPage, chatService, this::showLogin);
         groupController = new GroupController(groupPage, groupService, this::showChats);
         setupStage(stage);
 
@@ -99,6 +98,7 @@ public class Main extends Application {
      * Metoda, która zmienia źródło wyświetlania w oknie na okno czatu
      */
     private void showChats() {
+        chatController = new ChatController(chatPage, chatService, this::showLogin);
         scene.setRoot(chatPage.getView());
 
         scene.getStylesheets().setAll(
