@@ -4,13 +4,19 @@ import java.time.LocalDateTime;
 public class Message {
 
     /** Użytkownik będący nadawcą wiadomości */
-    private final User sender;
+    private String sender;
+
+    private Long id;
+
+    private Long groupId;
 
     /** Treść wiadomości */
-    private final String content;
+    private String content;
 
     /** Data i czas wysłania wiadomości */
     private LocalDateTime timestamp;
+
+    public Message() {}
 
     /**
      * Konstruktor klasy Message.
@@ -19,7 +25,7 @@ public class Message {
      * @param sender - użytkownik wysyłający wiadomość
      * @param content - treść wiadomości
      */
-    public Message(User sender, String content) {
+    public Message(String sender, String content) {
         this.sender = sender;
         this.content = content;
         this.timestamp = LocalDateTime.now();
@@ -33,7 +39,7 @@ public class Message {
      * @param content - treść wiadomości
      * @param timestamp - data i czas wysłania wiadomości
      */
-    public Message(User sender, String content, LocalDateTime timestamp) {
+    public Message(String sender, String content, LocalDateTime timestamp) {
         this.sender = sender;
         this.content = content;
         this.timestamp = timestamp;
@@ -43,7 +49,7 @@ public class Message {
      * Zwraca nadawcę wiadomości.
      * @return obiekt użytkownika będącego nadawcą
      */
-    public User getSender() {
+    public String getSender() {
         return sender;
     }
 
@@ -60,5 +66,13 @@ public class Message {
     public LocalDateTime getTimestamp() {
         return timestamp;
     }
+
+    public void setGroupId(Long groupId) { this.groupId = groupId;}
+
+    public Long getGroupId() { return this.groupId;}
+
+    public void setId(Long id) { this.id = id;}
+
+    public Long getId() { return this.id; }
 }
 

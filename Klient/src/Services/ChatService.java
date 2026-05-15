@@ -2,8 +2,12 @@ package Services;
 
 import Models.Group;
 
+import Models.Message;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import security.TokenStorage;
 
 import java.io.IOException;
@@ -11,6 +15,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Klasa obsługująca operacje związane z czatem.
@@ -53,6 +59,38 @@ public class ChatService {
             e.printStackTrace();
         }
 
+        return null;
+    }
+
+    public List<Message> loadMessages() {
+        if (TokenStorage.getUser() == null) {
+            return null;
+        }
+        try {
+            Long groupId = TokenStorage.getUser().getGroupId();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/messages/" + groupId))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            System.out.println(response.body());
+            if (response.statusCode() == 200) {
+                JsonNode root = mapper.readTree(response.body());
+
+                JsonNode messagesNode = root.get("messages");
+                mapper.registerModule(new JavaTimeModule());
+                List<Message> messages = mapper.readValue(
+                        messagesNode.toString(),
+                        new TypeReference<List<Message>>() {}
+                );
+                return messages;
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 }

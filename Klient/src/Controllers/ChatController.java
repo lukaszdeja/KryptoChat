@@ -8,6 +8,8 @@ import Models.User;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ListCell;
 import security.TokenStorage;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Kontroler obsługujący logikę czatu.
@@ -59,7 +61,11 @@ public class ChatController {
     }
 
     public void loadMessages() {
-        return;
+        List<Message> messages = chatService.loadMessages();
+        chatView.getMessages().clear();
+        if (messages != null) {
+            chatView.getMessages().addAll(messages);
+        }
     }
 
     public void logout() {
