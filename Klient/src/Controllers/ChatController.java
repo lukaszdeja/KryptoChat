@@ -2,14 +2,17 @@ package Controllers;
 
 import Models.Group;
 import Services.ChatService;
+import Services.WebSocketService;
 import Views.Chat;
 import Models.Message;
 import Models.User;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ListCell;
 import security.TokenStorage;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDateTime;
 
 /**
  * Kontroler obsługujący logikę czatu.
@@ -21,6 +24,7 @@ public class ChatController {
     private final Chat chatView;
     private ChatService chatService;
     private Runnable goToLogin;
+    private final WebSocketService webSocketService = new WebSocketService();
 
     Group group;
 
@@ -43,9 +47,17 @@ public class ChatController {
         chatView.getSendButton().setOnAction(e -> handleSend());
         chatView.getMessageField().setOnAction(e -> handleSend());
         chatView.getLogoutButton().setOnAction(e -> logout());
-
         loadGroup();
         loadMessages();
+        webSocketService.connect();
+
+        webSocketService.setOnMessageReceived(message -> {
+
+            Platform.runLater(() -> {
+                chatView.getMessages()
+                        .add(message);
+            });
+        });
     }
 
     public void loadGroup() {
@@ -79,17 +91,18 @@ public class ChatController {
      * Pobiera tekst z pola, sprawdza wybranego użytkownika
      * i dodaje nową wiadomość do listy.
      */
-    private void handleSend(){
-        //User user = chatView.getUserList().getSelectionModel().getSelectedItem();
+    private void handleSend() {
         String text = chatView.getMessageField().getText();
 
         if (text == null || text.isEmpty()) return;
 
-        //if (user == null) {
-          //  chatView.getMessages().add(new Message(new User(0L, "System", 0L), "Wybierz użytkownika!"));
-        //} else {
-          //  chatView.getMessages().add(new Message(new User(0L, "Ja", 0L), text)); //tu trzeba wstawic zalogowanego uzytkownika
-        //}
+        Message message = new Message();
+        message.setSender(TokenStorage.getUser().getUsername());
+        message.setContent(text);
+        message.setGroupId(TokenStorage.getUser().getGroupId());
+        message.setTimestamp(LocalDateTime.now());
+
+        webSocketService.send(message);
 
         chatView.getMessageField().clear();
     }

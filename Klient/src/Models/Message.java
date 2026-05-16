@@ -53,6 +53,10 @@ public class Message {
         return sender;
     }
 
+    public void setSender(String sender) { this.sender = sender; }
+
+    public void setContent(String content) { this.content = content; }
+
     /**
      * Zwraca treść wiadomości.
      */
@@ -66,6 +70,8 @@ public class Message {
     public LocalDateTime getTimestamp() {
         return timestamp;
     }
+
+    public void setTimestamp(LocalDateTime time) { this.timestamp = time; }
 
     public void setGroupId(Long groupId) { this.groupId = groupId;}
 
