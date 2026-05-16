@@ -53,7 +53,8 @@ public class LoginService {
             if (response.statusCode() == 200) {
 
                 JsonNode node = mapper.readTree(response.body());
-                JsonNode tokenNode = node.get("userToken");
+                String token = node.get("jwt").asText();
+                JsonNode tokenNode = node.get("userCredentials");
 
                 if (tokenNode == null) {
                     return new ServiceResponse(false, "Błąd serwera - brak tokenu");
@@ -62,7 +63,7 @@ public class LoginService {
                 User user = mapper.treeToValue(tokenNode, User.class);
 
                 TokenStorage.setUser(user);
-                TokenStorage.saveToken(tokenNode.toString());
+                TokenStorage.saveToken(token);
 
                 return new ServiceResponse(true, "Zalogowano pomyślnie");
             }

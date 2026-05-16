@@ -15,39 +15,39 @@ public class TokenStorage {
     private static final Path FILE = Paths.get(
             System.getProperty("user.home"), ".KryptoChatapp", "token.dat");
 
-    // ===== SAVE TOKEN =====
+
     public static void saveToken(String token) {
         try {
             Files.createDirectories(FILE.getParent());
 
-            String encrypted = Crypto.encrypt(token);
             cachedToken = token;
-            Files.writeString(FILE, encrypted);
+            Files.writeString(FILE, token);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    // ===== LOAD TOKEN =====
-    public static void loadUser() {
+
+    public static String loadUser() {
         try {
-            if (!Files.exists(FILE)) return;
-            ObjectMapper mapper = new ObjectMapper();
-            String encrypted = Files.readString(FILE);
-            String json = Crypto.decrypt(encrypted);
-            TokenStorage.setUser(mapper.readValue(json, User.class));
+            if (!Files.exists(FILE)) return null;
+            String token = Files.readString(FILE);
+            cachedToken = token;
+            return cachedToken;
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
 
-    // ===== DELETE TOKEN =====
+
     public static void deleteToken() {
         try {
             Files.deleteIfExists(FILE);
             cachedToken = null;
+            cachedUser = null;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -59,5 +59,7 @@ public class TokenStorage {
     public static User getUser() {
         return cachedUser;
     }
+
+    public static String getCachedToken() { return  cachedToken; }
 
 }

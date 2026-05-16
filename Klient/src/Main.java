@@ -1,7 +1,5 @@
-import Services.ChatService;
-import Services.GroupService;
-import Services.LoginService;
-import Services.RegisterService;
+import Models.User;
+import Services.*;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -31,6 +29,7 @@ public class Main extends Application {
     private GroupController groupController;
     private GroupService groupService;
     private ChatService chatService;
+    private AuthentificationService authService;
 
     /** Metoda start
      * inicjuje widoki logowania oraz rejestracji
@@ -50,6 +49,7 @@ public class Main extends Application {
         loginController = new LoginController(loginPage, loginService, this::showCreateGroup, this::showChats);
         registerController = new RegisterController(registerPage, registerService, this::showLogin);
         groupController = new GroupController(groupPage, groupService, this::showChats);
+        authService = new AuthentificationService();
         setupStage(stage);
 
         // WYBIERZ WIDOK STARTOWY:
@@ -58,16 +58,18 @@ public class Main extends Application {
          //showCreateGroup();
         //showRegister();
 
-        TokenStorage.loadUser();
-       if (TokenStorage.getUser() != null) {
-            if (TokenStorage.getUser().getGroupId() == null) {
-                showCreateGroup();
-            } else {
-                showChats();
-            }
-        } else {
+       String token =  TokenStorage.getCachedToken();
+       if (token == null) {
             showLogin();
        }
+       User user = authService.checkUser(token);
+       TokenStorage.setUser(user);
+       if (user.getGroupId() != null) {
+           showChats();
+       } else {
+           showCreateGroup();
+       }
+
     }
 
     /**

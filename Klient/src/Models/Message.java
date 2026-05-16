@@ -14,7 +14,7 @@ public class Message {
     private String content;
 
     /** Data i czas wysłania wiadomości */
-    private LocalDateTime timestamp;
+    private LocalDateTime send_time;
 
     public Message() {}
 
@@ -28,7 +28,7 @@ public class Message {
     public Message(String sender, String content) {
         this.sender = sender;
         this.content = content;
-        this.timestamp = LocalDateTime.now();
+        this.send_time = LocalDateTime.now();
     }
 
     /**
@@ -37,12 +37,12 @@ public class Message {
      *
      * @param sender - użytkownik wysyłający wiadomość
      * @param content - treść wiadomości
-     * @param timestamp - data i czas wysłania wiadomości
+     * @param send_time - data i czas wysłania wiadomości
      */
-    public Message(String sender, String content, LocalDateTime timestamp) {
+    public Message(String sender, String content, LocalDateTime send_time) {
         this.sender = sender;
         this.content = content;
-        this.timestamp = timestamp;
+        this.send_time = send_time;
     }
 
     /**
@@ -67,11 +67,11 @@ public class Message {
     /**
      * Zwraca date i czas wysłania wiadomości.
      */
-    public LocalDateTime getTimestamp() {
-        return timestamp;
+    public LocalDateTime getSend_time() {
+        return send_time;
     }
 
-    public void setTimestamp(LocalDateTime time) { this.timestamp = time; }
+    public void setSend_time(LocalDateTime send_time) { this.send_time = send_time; }
 
     public void setGroupId(Long groupId) { this.groupId = groupId;}
 

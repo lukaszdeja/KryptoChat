@@ -100,7 +100,7 @@ public class ChatController {
         message.setSender(TokenStorage.getUser().getUsername());
         message.setContent(text);
         message.setGroupId(TokenStorage.getUser().getGroupId());
-        message.setTimestamp(LocalDateTime.now());
+        message.setSend_time(LocalDateTime.now());
 
         webSocketService.send(message);
 
