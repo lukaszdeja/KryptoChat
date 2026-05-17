@@ -58,16 +58,17 @@ public class Main extends Application {
          //showCreateGroup();
         //showRegister();
 
-       String token =  TokenStorage.getCachedToken();
+       String token =  TokenStorage.loadUser();
        if (token == null) {
             showLogin();
-       }
-       User user = authService.checkUser(token);
-       TokenStorage.setUser(user);
-       if (user.getGroupId() != null) {
-           showChats();
        } else {
-           showCreateGroup();
+           User user = authService.checkUser(token);
+           TokenStorage.setUser(user);
+           if (user.getGroupId() != null) {
+               showChats();
+           } else {
+               showCreateGroup();
+           }
        }
 
     }

@@ -53,6 +53,7 @@ public class LoginService {
             if (response.statusCode() == 200) {
 
                 JsonNode node = mapper.readTree(response.body());
+                System.out.println(node);
                 String token = node.get("jwt").asText();
                 JsonNode tokenNode = node.get("userCredentials");
 

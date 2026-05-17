@@ -31,15 +31,14 @@ public class GroupService {
     public ServiceResponse createGroup(String groupName) {
 
         try {
-            CreateGroupRequest requestBody = new CreateGroupRequest();
-            requestBody.setGroupName(groupName);
-            requestBody.setUsername(TokenStorage.getUser().getUsername());
+            CreateGroupRequest requestBody = new CreateGroupRequest(groupName);
 
             String json = mapper.writeValueAsString(requestBody);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/groups/create"))
                     .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + TokenStorage.getCachedToken())
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
 
@@ -69,15 +68,14 @@ public class GroupService {
     public ServiceResponse joinGroup(String code) {
 
         try {
-            JoinGroupRequest requestBody = new JoinGroupRequest();
-            requestBody.setCode(code);
-            requestBody.setUsername(TokenStorage.getUser().getUsername());
+            JoinGroupRequest requestBody = new JoinGroupRequest(code);
 
             String json = mapper.writeValueAsString(requestBody);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/groups/join"))
                     .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + TokenStorage.getCachedToken())
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
 
@@ -107,13 +105,14 @@ public class GroupService {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode node = mapper.readTree(response.body());
-            Long groupId = node.get("groupId").asLong();
+            String jwt = node.get("jwt").asText();
+            JsonNode userCredentials = node.get("userCredentials");
+            Long groupId = userCredentials.get("groupId").isNull() ? null : userCredentials.get("groupId").asLong();
             System.out.println(groupId);
             if (groupId != null) {
                 TokenStorage.getUser().setGroupId(groupId);
                 TokenStorage.deleteToken();
-                String storeUser = mapper.writeValueAsString(TokenStorage.getUser());
-                TokenStorage.saveToken(storeUser);
+                TokenStorage.saveToken(jwt);
                 return true;
             } else {
                 //System.out.println("Nie udalo sie zapisac");
