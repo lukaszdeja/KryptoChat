@@ -84,6 +84,14 @@ public class WebSocketService {
                                 public void onError(WebSocket webSocket, Throwable error) {
                                     error.printStackTrace();
                                 }
+
+                                @Override
+                                public CompletionStage<?> onClose(WebSocket webSocket,
+                                                                  int statusCode,
+                                                                  String reason) {
+                                    System.out.println("WebSocket closed: " + statusCode + " " + reason);
+                                    return null;
+                                }
                             }
                     )
                     .thenAccept(ws -> this.webSocket = ws);
