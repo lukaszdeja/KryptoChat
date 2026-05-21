@@ -7,45 +7,59 @@ import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 import security.TokenStorage;
 
-
 /**
- * Klasa obsługująca controller logowania - połączenie interfejsu z backendem
+ * Kontroler obsługujący logowanie użytkownika.
+ * Łączy widok logowania z serwisem autoryzacji.
  */
 public class LoginController {
+
+    /** Widok logowania */
     private Login loginView;
+
+    /** Serwis obsługujący logowanie */
     private LoginService logservice;
+
+    /** Akcja przejścia do widoku grup */
     Runnable goToGroups;
+
+    /** Akcja przejścia do widoku czatu */
     Runnable goToChats;
 
     /**
-     * Konstruktor klasy, inicjuje pola klasy i wywoluje metode init()
-     * @param view - obiekt okna logowania (UI)
-     * @param service - obiekt serwisu logowania
-     * @param goToGroups - callback do funkcji przelaczajacej widok na okno czatu
+     * Konstruktor kontrolera logowania.
+     * @param view widok logowania
+     * @param service serwis obsługujący logowanie
+     * @param goToGroups akcja przełączająca widok na widok dołączania do/tworzenia grupy
+     * @param goToChats akcja przełączająca widok na widok czatu
      */
     public LoginController(Login view, LoginService service, Runnable goToGroups, Runnable goToChats)  {
         this.loginView = view;
         this.logservice = service;
         this.goToGroups = goToGroups;
         this.goToChats = goToChats;
+
         init();
     }
 
     /**
-     * Pomocnicza metoda, ktora przypisuje do przycisku z widoku logowania reakcje na klikniecie
-     * Po kliknieciu przycisku wywolana jest metoda handleLogin()
+     * Inicjalizuje obsługę zdarzeń w widoku logowania.
+     * Po kliknięciu przycisku wykonywana jest metoda handleLogin().
      */
     private void init() {
         loginView.getButton().setOnAction(e -> handleLogin());
     }
 
     /**
-     * Metoda obsluguje procedurę logowania
-     * Frontendowa walidacja danych
-     * Przekazanie do serwisu
-     * Odpowiedź z serwisu i reakcją na nią
+     * Obsługuje proces logowania użytkownika.
+     * Pobiera dane z formularza, sprawdza czy pola nie są puste,
+     * wysyła żądanie logowania do serwisu oraz reaguje na odpowiedź.
+     *
+     * Po poprawnym logowaniu użytkownik zostaje przekierowany:
+     * - do czatu, jeśli jest już w którejś grupie,
+     * - do widoku grup, jeśli nie należy jeszcze do żadnej grupy.
      */
     private void handleLogin() {
+
         String username = loginView.getLogin().getText();
         String password = loginView.getPassword().getText();
 
@@ -63,6 +77,7 @@ public class LoginController {
             if (TokenStorage.getUser().getGroupId() != null) {
                 delay.setOnFinished(e -> goToChats.run());
                 delay.play();
+
             } else {
                 delay.setOnFinished(e -> goToGroups.run());
                 delay.play();

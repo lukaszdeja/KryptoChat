@@ -1,13 +1,19 @@
 package Models;
+
 import java.time.LocalDateTime;
 
+/**
+ * Model reprezentujący wiadomość na czacie.
+ */
 public class Message {
 
-    /** Użytkownik będący nadawcą wiadomości */
+    /** Nazwa użytkownika będącego nadawcą wiadomości */
     private String sender;
 
+    /** Unikalny identyfikator wiadomości */
     private Long id;
 
+    /** Identyfikator grupy, do której należy wiadomość */
     private Long groupId;
 
     /** Treść wiadomości */
@@ -16,14 +22,15 @@ public class Message {
     /** Data i czas wysłania wiadomości */
     private LocalDateTime send_time;
 
+    /**
+     * Domyślny konstruktor klasy Message.
+     */
     public Message() {}
 
     /**
-     * Konstruktor klasy Message.
-     * Tworzy wiadomość z aktualnym czasem jako timestamp.
-     *
-     * @param sender - użytkownik wysyłający wiadomość
-     * @param content - treść wiadomości
+     * Konstruktor tworzący wiadomość z aktualnym czasem wysłania.
+     * @param sender nazwa użytkownika wysyłającego wiadomość
+     * @param content treść wiadomości
      */
     public Message(String sender, String content) {
         this.sender = sender;
@@ -32,12 +39,10 @@ public class Message {
     }
 
     /**
-     * Konstruktor klasy Message.
-     * Tworzy wiadomość z podanym czasem.
-     *
-     * @param sender - użytkownik wysyłający wiadomość
-     * @param content - treść wiadomości
-     * @param send_time - data i czas wysłania wiadomości
+     * Konstruktor tworzący wiadomość z podanym czasem wysłania.
+     * @param sender nazwa użytkownika wysyłającego wiadomość
+     * @param content treść wiadomości
+     * @param send_time data i czas wysłania wiadomości
      */
     public Message(String sender, String content, LocalDateTime send_time) {
         this.sender = sender;
@@ -46,39 +51,82 @@ public class Message {
     }
 
     /**
-     * Zwraca nadawcę wiadomości.
-     * @return obiekt użytkownika będącego nadawcą
+     * Zwraca nazwę nadawcy wiadomości.
+     * @return nazwa użytkownika
      */
     public String getSender() {
         return sender;
     }
 
-    public void setSender(String sender) { this.sender = sender; }
+    /**
+     * Ustawia nadawcę wiadomości.
+     * @param sender nazwa użytkownika
+     */
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
 
-    public void setContent(String content) { this.content = content; }
+    /**
+     * Ustawia treść wiadomości.
+     * @param content treść wiadomości
+     */
+    public void setContent(String content) {
+        this.content = content;
+    }
 
     /**
      * Zwraca treść wiadomości.
+     * @return treść wiadomości
      */
     public String getContent() {
         return content;
     }
 
     /**
-     * Zwraca date i czas wysłania wiadomości.
+     * Zwraca datę i czas wysłania wiadomości.
+     * @return data i czas wysłania
      */
     public LocalDateTime getSend_time() {
         return send_time;
     }
 
-    public void setSend_time(LocalDateTime send_time) { this.send_time = send_time; }
+    /**
+     * Ustawia datę i czas wysłania wiadomości.
+     * @param send_time data i czas wysłania
+     */
+    public void setSend_time(LocalDateTime send_time) {
+        this.send_time = send_time;
+    }
 
-    public void setGroupId(Long groupId) { this.groupId = groupId;}
+    /**
+     * Ustawia identyfikator grupy wiadomości.
+     * @param groupId identyfikator grupy
+     */
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
+    }
 
-    public Long getGroupId() { return this.groupId;}
+    /**
+     * Zwraca identyfikator grupy wiadomości.
+     * @return identyfikator grupy
+     */
+    public Long getGroupId() {
+        return this.groupId;
+    }
 
-    public void setId(Long id) { this.id = id;}
+    /**
+     * Ustawia identyfikator wiadomości.
+     * @param id identyfikator wiadomości
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public Long getId() { return this.id; }
+    /**
+     * Zwraca identyfikator wiadomości.
+     * @return identyfikator wiadomości
+     */
+    public Long getId() {
+        return this.id;
+    }
 }
-

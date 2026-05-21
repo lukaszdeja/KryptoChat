@@ -7,19 +7,25 @@ import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 
 /**
- * Klasa obsługująca controller tworzenia lub dołączania do grupy - połączenie interfejsu z backendem
+ * Kontroler obsługujący tworzenie oraz dołączanie do grupy.
+ * Łączy widok z logiką aplikacji i serwisem grup.
  */
 public class GroupController {
 
+    /** Widok tworzenia/dołączania do grupy */
     private CreateGroup groupView;
+
+    /** Serwis obsługujący operacje na grupach */
     private GroupService groupService;
+
+    /** Akcja przejścia do widoku czatu */
     private Runnable goToChats;
 
-
-    /* Konstruktor klasy, inicjuje pola klasy i wywoluje metode init()
-     * @param view - obiekt okna (UI)
-     * @param service - obiekt serwisu obsługi grup
-     * @param goToChats - callback do funkcji przelaczajacej widok na okno czatu
+    /**
+     * Konstruktor kontrolera grup.
+     * @param view widok tworzenia/dołączania do grupy
+     * @param service serwis obsługujący grupy
+     * @param chats akcja przełączająca widok na widok czatu
      */
     public GroupController(CreateGroup view, GroupService service, Runnable chats) {
         this.groupView = view;
@@ -30,10 +36,7 @@ public class GroupController {
     }
 
     /**
-     * Pomocnicza metoda, która przypisuje do przycisków z widoku odpowiednie reakcje na kliknięcie.
-     * Po kliknięciu przycisku wywoływana jest odpowiednia metoda obsługująca akcję:
-     * - createGroup() dla tworzenia grupy
-     * - joinGroup() dla dołączania do istniejącej grupy
+     * Inicjalizuje obsługę zdarzeń przycisków w widoku.
      */
     private void init() {
         groupView.getCreate().setOnAction(e -> createGroup());
@@ -41,11 +44,8 @@ public class GroupController {
     }
 
     /**
-     * Metoda odpowiedzialna za tworzenie nowej grupy.
-     * Pobiera nazwę grupy z pola tekstowego, waliduje ją,a następnie wywołuje metodę serwisu tworzącą grupę.
-     * W zależności od wyniku:
-     * - wyświetla komunikat błędu
-     * - lub przełącza widok na czat
+     * Obsługuje tworzenie nowej grupy.
+     * Sprawdza poprawność nazwy grupy, wysyła żądanie utworzenia grupy i po sukcesie przełącza widok na czat.
      */
     private void createGroup() {
         String groupName = groupView.getGroupNameField().getText();
@@ -66,16 +66,12 @@ public class GroupController {
         }
 
         ServiceResponse response = groupService.createGroup(groupName);
-
         groupView.getMessage().setText(response.getMessage());
 
         if (response.isSuccess()) {
-
-            PauseTransition delay =
-                    new PauseTransition(Duration.seconds(2));
+            PauseTransition delay = new PauseTransition(Duration.seconds(2));
 
             delay.setOnFinished(e -> goToChats.run());
-
             delay.play();
         }
 
@@ -83,11 +79,8 @@ public class GroupController {
     }
 
     /**
-     * Metoda odpowiedzialna za dołączanie do istniejącej grupy.
-     * Pobiera kod grupy z pola tekstowego, waliduje go, a następnie wywołuje metodę serwisu dołączającą do grupy.
-     * W zależności od wyniku:
-     * - wyświetla komunikat błędu
-     * - lub przełącza widok na czat
+     * Obsługuje dołączanie do istniejącej grupy na podstawie kodu.
+     * Po poprawnym dołączeniu przełącza widok na widok czatu.
      */
     private void joinGroup() {
         String code = groupView.getCodeField().getText();
@@ -98,23 +91,21 @@ public class GroupController {
         }
 
         ServiceResponse response = groupService.joinGroup(code);
-
         groupView.getMessage().setText(response.getMessage());
 
         if (response.isSuccess()) {
-
             PauseTransition delay = new PauseTransition(Duration.seconds(2));
-
             delay.setOnFinished(e -> goToChats.run());
-
             delay.play();
         }
 
         clearFields();
     }
 
+    /**
+     * Czyści pola do wpisywania.
+     */
     private void clearFields() {
-
         groupView.getGroupNameField().setText("");
         groupView.getCodeField().setText("");
     }

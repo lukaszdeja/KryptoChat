@@ -11,26 +11,43 @@ import java.net.http.WebSocket;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Consumer;
 
+/**
+ * Serwis odpowiedzialny za komunikację WebSocket z serwerem czatu.
+ * Obsługuje połączenie, wysyłanie oraz odbieranie wiadomości.
+ */
 public class WebSocketService {
 
+    /** Aktywne połączenie WebSocket */
     private WebSocket webSocket;
 
+    /** Mapper JSON do serializacji i deserializacji wiadomości */
     private final ObjectMapper mapper = new ObjectMapper();
 
+    /** Callback wywoływany po otrzymaniu nowej wiadomości */
     private Consumer<Message> onMessageReceived;
 
+    /**
+     * Nawiązuje połączenie WebSocket z serwerem czatu.
+     * Jeśli istnieje już aktywne połączenie, zostaje ono zamknięte.
+     */
     public void connect() {
 
         if (webSocket != null) {
             disconnect();
         }
+
         HttpClient client = HttpClient.newHttpClient();
+
         mapper.registerModule(new JavaTimeModule());
+
         try {
+
             String token = TokenStorage.getCachedToken();
+
             client.newWebSocketBuilder()
                     .header("Authorization", "Bearer " + token)
-                    .buildAsync(URI.create("wss://kryptochatserwer-production.up.railway.app/ws"),
+                    .buildAsync(
+                            URI.create("wss://kryptochatserwer-production.up.railway.app/ws"),
                             new WebSocket.Listener() {
 
                                 @Override
@@ -48,10 +65,7 @@ public class WebSocketService {
 
                                     try {
 
-                                        Message message = mapper.readValue(
-                                                data.toString(),
-                                                Message.class
-                                        );
+                                        Message message = mapper.readValue(data.toString(), Message.class);
 
                                         if (onMessageReceived != null) {
                                             onMessageReceived.accept(message);
@@ -73,17 +87,22 @@ public class WebSocketService {
                             }
                     )
                     .thenAccept(ws -> this.webSocket = ws);
+
         } catch (Exception e) {
+
             e.printStackTrace();
         }
     }
 
+    /**
+     * Wysyła wiadomość przez WebSocket do serwera.
+     * @param message wiadomość do wysłania
+     */
     public void send(Message message) {
 
         try {
 
             String json = mapper.writeValueAsString(message);
-
             webSocket.sendText(json, true);
 
         } catch (Exception e) {
@@ -91,13 +110,18 @@ public class WebSocketService {
         }
     }
 
+    /**
+     * Zamyka aktywne połączenie WebSocket.
+     */
     public void disconnect() {
+
         try {
+
             if (webSocket != null) {
+
                 webSocket.sendClose(
-                        WebSocket.NORMAL_CLOSURE,
-                        "logout"
-                ).join();
+                        WebSocket.NORMAL_CLOSURE, "logout").join();
+
                 webSocket = null;
                 System.out.println("WebSocket zamknięty");
             }
@@ -107,6 +131,10 @@ public class WebSocketService {
         }
     }
 
+    /**
+     * Ustawia callback wywoływany po otrzymaniu nowej wiadomości.
+     * @param consumer funkcja obsługująca wiadomość
+     */
     public void setOnMessageReceived(Consumer<Message> consumer) {
         this.onMessageReceived = consumer;
     }

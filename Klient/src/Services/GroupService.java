@@ -6,44 +6,49 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 import Models.User;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import security.TokenStorage;
 
 /**
- * Klasa obsługująca operacje związane z grupami (tworzenie oraz dołączanie).
- * Realizuje komunikację z backendem poprzez wysyłanie żądań HTTP w formacie JSON.
- * Na podstawie odpowiedzi serwera (status HTTP) określa powodzenie operacji.
+ * Serwis odpowiedzialny za operacje na grupach:
+ * tworzenie grupy oraz dołączanie do istniejącej grupy.
+ * Komunikuje się z backendem poprzez HTTP JSON API.
  */
 public class GroupService {
 
+    /** Klient HTTP używany do komunikacji z backendem */
     private final HttpClient client = HttpClient.newHttpClient();
+
+    /** Mapper JSON do serializacji i deserializacji odpowiedzi */
     private final ObjectMapper mapper = new ObjectMapper();
 
     /**
-     * Metoda obsługująca tworzenie grupy
-     * Metoda tworzy obiekt requesta, przesyła go w formacie JSON na serwer
-     * i na podstawie odpowiedzi HTTP określa czy operacja zakończyła się sukcesem
+     * Tworzy nową grupę na backendzie.
+     *
+     * Proces:
+     * - buduje request JSON,
+     * - wysyła żądanie POST,
+     * - interpretuje odpowiedź serwera.
      *
      * @param groupName nazwa tworzonej grupy
-     * @return ServiceResponse zawierający boolean czy się udało stworzyć grupe wraz z komunikatem
+     * @return ServiceResponse z informacją o wyniku operacji
      */
     public ServiceResponse createGroup(String groupName) {
 
         try {
-            CreateGroupRequest requestBody = new CreateGroupRequest(groupName);
 
+            CreateGroupRequest requestBody = new CreateGroupRequest(groupName);
             String json = mapper.writeValueAsString(requestBody);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/groups/create"))
                     .header("Content-Type", "application/json")
                     .header("Authorization", "Bearer " + TokenStorage.getCachedToken())
-                    .POST(HttpRequest.BodyPublishers.ofString(json))
-                    .build();
+                    .POST(HttpRequest.BodyPublishers.ofString(json)).build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
             switch (response.statusCode()) {
 
                 case 200:
@@ -52,6 +57,7 @@ public class GroupService {
                 default:
                     return new ServiceResponse(false, "Błąd serwera");
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             return new ServiceResponse(false, "Brak połączenia z serwerem");
@@ -59,16 +65,20 @@ public class GroupService {
     }
 
     /**
-     * Metoda obsługująca dołączanie do grupy
-     * Metoda tworzy obiekt requesta, przesyła go w formacie JSON na serwer
-     * i na podstawie odpowiedzi HTTP określa czy operacja zakończyła się sukcesem
+     * Dołącza użytkownika do istniejącej grupy.
+     *
+     * Proces:
+     * - buduje request JSON z kodem grupy,
+     * - wysyła żądanie POST,
+     * - analizuje odpowiedź serwera.
      *
      * @param code kod grupy
-     * @return ServiceResponse zawierający boolean czy się udało dołączyć do grupy wraz z komunikatem
+     * @return ServiceResponse z wynikiem operacji
      */
     public ServiceResponse joinGroup(String code) {
 
         try {
+
             JoinGroupRequest requestBody = new JoinGroupRequest(code);
 
             String json = mapper.writeValueAsString(requestBody);
@@ -77,11 +87,9 @@ public class GroupService {
                     .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/groups/join"))
                     .header("Content-Type", "application/json")
                     .header("Authorization", "Bearer " + TokenStorage.getCachedToken())
-                    .POST(HttpRequest.BodyPublishers.ofString(json))
-                    .build();
+                    .POST(HttpRequest.BodyPublishers.ofString(json)).build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("Status: " + response.statusCode());
 
             switch (response.statusCode()) {
 
@@ -94,32 +102,38 @@ public class GroupService {
                 default:
                     return new ServiceResponse(false, "Błąd serwera");
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             return new ServiceResponse(false, "Brak połączenia z serwerem");
         }
-
     }
 
-
+    /**
+     * Przetwarza odpowiedź serwera po utworzeniu lub dołączeniu do grupy.
+     *
+     * Wyciąga:
+     * - nowy JWT token,
+     * - dane użytkownika (w tym groupId),
+     * a następnie aktualizuje TokenStorage.
+     *
+     * @param response odpowiedź HTTP z backendu
+     * @return true jeśli zapis zakończył się sukcesem, false w przeciwnym razie
+     */
     private boolean saveResponse(HttpResponse<String> response) {
-        try {
-            JsonNode node = mapper.readTree(response.body());
 
+        try {
+
+            JsonNode node = mapper.readTree(response.body());
             String jwt = node.get("jwt").asText();
             JsonNode userCredentials = node.get("userCredentials");
-
-            Long groupId = userCredentials.get("groupId").isNull()
-                    ? null
-                    : userCredentials.get("groupId").asLong();
+            Long groupId = userCredentials.get("groupId").isNull() ? null : userCredentials.get("groupId").asLong();
 
             if (groupId == null) return false;
 
             User user = TokenStorage.getUser();
 
-            if (user == null) {
-                user = new User();
-            }
+            if (user == null) { user = new User(); }
 
             user.setGroupId(groupId);
 

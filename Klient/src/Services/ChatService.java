@@ -1,12 +1,10 @@
 package Services;
 
 import Models.Group;
-
 import Models.Message;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import security.TokenStorage;
 
@@ -16,10 +14,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
- * Klasa obsługująca operacje związane z czatem.
+ * Serwis odpowiedzialny za operacje związane z czatem, w tym pobieranie grupy oraz wiadomości użytkownika.
  */
 public class ChatService {
 
@@ -29,8 +26,8 @@ public class ChatService {
 
     /**
      * Pobiera dane grupy zalogowanego użytkownika.
-     * @return Group - grupa wraz z użytkownikami
-     * @return null, gdy się nie udało
+     * @return obiekt Group zawierający dane grupy i użytkowników
+     * @return null w przypadku błędu lub braku użytkownika
      */
     public Group loadGroup() {
 
@@ -40,19 +37,18 @@ public class ChatService {
         }
 
         try {
+
             String token = TokenStorage.getCachedToken();
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/groups/"))
-                    .header("Authorization", "Bearer " + token)
-                    .GET()
-                    .build();
+                    .header("Authorization", "Bearer " + token).GET().build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             System.out.println(response.body());
 
-            if(response.statusCode() == 200) {
+            if (response.statusCode() == 200) {
                 return mapper.readValue(response.body(), Group.class);
             }
 
@@ -63,11 +59,18 @@ public class ChatService {
         return null;
     }
 
+    /**
+     * Pobiera listę wiadomości użytkownika z API.
+     * @return lista wiadomości lub null w przypadku błędu
+     */
     public List<Message> loadMessages() {
+
         if (TokenStorage.getUser() == null) {
             return null;
         }
+
         try {
+
             String token = TokenStorage.getCachedToken();
 
             HttpRequest request = HttpRequest.newBuilder()
@@ -79,20 +82,25 @@ public class ChatService {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             System.out.println(response.body());
-            if (response.statusCode() == 200) {
-                JsonNode root = mapper.readTree(response.body());
 
+            if (response.statusCode() == 200) {
+
+                JsonNode root = mapper.readTree(response.body());
                 JsonNode messagesNode = root.get("messages");
                 mapper.registerModule(new JavaTimeModule());
+
                 List<Message> messages = mapper.readValue(
                         messagesNode.toString(),
                         new TypeReference<List<Message>>() {}
                 );
+
                 return messages;
             }
+
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+
         return null;
     }
 }

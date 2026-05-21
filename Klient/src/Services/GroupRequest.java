@@ -1,18 +1,16 @@
 package Services;
 
-
+/**
+ * Klasa bazowa dla requestów związanych z operacjami na grupach.
+ * Umożliwia serializację/deserializację obiektów do JSON przesyłanych do backendu.
+ */
 public class GroupRequest {
     public GroupRequest() {}
 }
 
 /**
- * Klasa potrzebna do tworzenia obiektów requestów związanych z grupami,
- * które mogą być serializowane do formatu JSON (np. do wysłania do backendu)
- * oraz deserializowane z JSON (odtwarzanie obiektu).
- *
- * Obsługuje:
- * - tworzenie grupy (groupName)
- * - dołączanie do grupy (code)
+ * Request używany przy tworzeniu nowej grupy.
+ * Zawiera nazwę grupy wysyłaną do backendu.
  */
 class CreateGroupRequest extends GroupRequest {
 
@@ -22,28 +20,46 @@ class CreateGroupRequest extends GroupRequest {
     }
     public CreateGroupRequest() {}
 
-    // Settery
+    /**
+     * Ustawia nazwę grupy.
+     * @param groupName nazwa grupy
+     */
     public void setGroupName(String groupName) {
         this.groupName = groupName;
     }
 
+    /**
+     * Zwraca nazwę grupy.
+     * @return nazwa grupy
+     */
     public String getGroupName() {
         return groupName;
     }
 }
 
+/**
+ * Request używany przy dołączaniu do istniejącej grupy.
+ * Zawiera kod grupy.
+ */
 class JoinGroupRequest extends GroupRequest {
     private String code;
     public JoinGroupRequest() {}
     public JoinGroupRequest(String code) {
         this.code = code;
     }
-    // Settery
+
+    /**
+     * Ustawia kod grupy.
+     * @return nic nie zwraca
+     */
     public void setCode(String code) {
         this.code = code;
     }
 
-    // Gettery
+    /**
+     * Zwraca kod grupy.
+     * @return kod grupy
+     */
     public String getCode() {
         return code;
     }

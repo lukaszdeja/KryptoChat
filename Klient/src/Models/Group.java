@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Klasa reprezentująca grupę użytkowników.
+ * Model reprezentujący grupę użytkowników.
  */
 public class Group {
 
@@ -17,23 +17,27 @@ public class Group {
     /** Lista użytkowników należących do grupy */
     private List<User> users = new ArrayList<>();
 
+    /** Kod umożliwiający dołączenie do grupy */
     private String code;
 
     /**
-     * Konstruktor klasy Group.
-     *
-     * @param ID - identyfikator grupy
-     * @param name - nazwa grupy
+     * Konstruktor tworzący grupę z identyfikatorem i nazwą.
+     * @param ID identyfikator grupy
+     * @param name nazwa grupy
      */
     public Group(Long ID, String name){
         this.groupId = ID;
         this.groupName = name;
     }
 
+    /**
+     * Domyślny konstruktor klasy Group.
+     */
     public Group() {}
 
     /**
-     * Zwraca identyfikator grupy (groupId).
+     * Zwraca identyfikator grupy.
+     * @return identyfikator grupy
      */
     public Long getGroupId(){
         return this.groupId;
@@ -41,17 +45,23 @@ public class Group {
 
     /**
      * Zwraca nazwę grupy.
+     * @return nazwa grupy
      */
     public String getGroupName(){
         return this.groupName;
     }
 
-    public void setUsers(List<User> users) { this.users = users; }
+    /**
+     * Ustawia listę użytkowników należących do grupy.
+     * @param users lista użytkowników
+     */
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
 
     /**
-     * Ustawia nową nazwę grupy.
-     *
-     * @param groupName - nowa nazwa grupy
+     * Ustawia nazwę grupy.
+     * @param groupName nowa nazwa grupy
      */
     public void setGroupName(String groupName) {
         this.groupName = groupName;
@@ -59,6 +69,7 @@ public class Group {
 
     /**
      * Zwraca listę użytkowników należących do grupy.
+     * @return lista użytkowników
      */
     public List<User> getUsers() {
         return users;
@@ -66,18 +77,31 @@ public class Group {
 
     /**
      * Dodaje użytkownika do grupy.
-     * @param user - użytkownik do dodania
+     * @param user użytkownik do dodania
      */
     public void addUser(User user) {
         users.add(user);
     }
 
-    public void setCode(String code) { this.code = code; }
-
-    public String getCode() { return code; }
+    /**
+     * Ustawia kod grupy.
+     * @param code kod grupy
+     */
+    public void setCode(String code) {
+        this.code = code;
+    }
 
     /**
-     * Zwraca nazwę grupy jako jej reprezentację tekstową.
+     * Zwraca kod grupy.
+     * @return kod grupy
+     */
+    public String getCode() {
+        return code;
+    }
+
+    /**
+     * Nadpisuje metode toString() - zwraca nazwę grupy.
+     * @return nazwa grupy
      */
     @Override
     public String toString() {

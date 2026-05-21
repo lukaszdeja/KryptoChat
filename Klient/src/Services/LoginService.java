@@ -34,7 +34,6 @@ public class LoginService {
             loginRequest.setPassword(password);
 
             String json = mapper.writeValueAsString(loginRequest);
-
             HttpClient client = HttpClient.newHttpClient();
 
             HttpRequest request = HttpRequest.newBuilder()
