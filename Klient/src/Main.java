@@ -63,11 +63,15 @@ public class Main extends Application {
             showLogin();
        } else {
            User user = authService.checkUser(token);
-           TokenStorage.setUser(user);
-           if (user.getGroupId() != null) {
-               showChats();
+           if (user == null) {
+               showLogin();
            } else {
-               showCreateGroup();
+               TokenStorage.setUser(user);
+               if (user.getGroupId() != null) {
+                   showChats();
+               } else {
+                   showCreateGroup();
+               }
            }
        }
 
