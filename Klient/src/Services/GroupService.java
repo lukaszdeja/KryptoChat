@@ -5,6 +5,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import Models.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -103,24 +104,33 @@ public class GroupService {
 
     private boolean saveResponse(HttpResponse<String> response) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
             JsonNode node = mapper.readTree(response.body());
+
             String jwt = node.get("jwt").asText();
             JsonNode userCredentials = node.get("userCredentials");
-            Long groupId = userCredentials.get("groupId").isNull() ? null : userCredentials.get("groupId").asLong();
-            System.out.println(groupId);
-            if (groupId != null) {
-                TokenStorage.getUser().setGroupId(groupId);
-                TokenStorage.deleteToken();
-                TokenStorage.saveToken(jwt);
-                return true;
-            } else {
-                //System.out.println("Nie udalo sie zapisac");
-                return false;
+
+            Long groupId = userCredentials.get("groupId").isNull()
+                    ? null
+                    : userCredentials.get("groupId").asLong();
+
+            if (groupId == null) return false;
+
+            User user = TokenStorage.getUser();
+
+            if (user == null) {
+                user = new User();
             }
-        } catch (JsonProcessingException e) {
+
+            user.setGroupId(groupId);
+
+            TokenStorage.setUser(user);
+            TokenStorage.saveToken(jwt);
+
+            return true;
+
+        } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
-        return false;
     }
 }

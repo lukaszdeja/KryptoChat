@@ -62,4 +62,6 @@ public class TokenStorage {
 
     public static String getCachedToken() { return  cachedToken; }
 
+    public static void setCachedToken(String token) { cachedToken = token; }
+
 }

@@ -21,10 +21,16 @@ public class WebSocketService {
 
     public void connect() {
 
+        if (webSocket != null) {
+            disconnect();
+        }
         HttpClient client = HttpClient.newHttpClient();
         mapper.registerModule(new JavaTimeModule());
         try {
-            client.newWebSocketBuilder().buildAsync(URI.create("wss://kryptochatserwer-production.up.railway.app/ws?userid=" + TokenStorage.getUser().getId()),
+            String token = TokenStorage.getCachedToken();
+            client.newWebSocketBuilder()
+                    .header("Authorization", "Bearer " + token)
+                    .buildAsync(URI.create("wss://kryptochatserwer-production.up.railway.app/ws"),
                             new WebSocket.Listener() {
 
                                 @Override
@@ -79,6 +85,22 @@ public class WebSocketService {
             String json = mapper.writeValueAsString(message);
 
             webSocket.sendText(json, true);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void disconnect() {
+        try {
+            if (webSocket != null) {
+                webSocket.sendClose(
+                        WebSocket.NORMAL_CLOSURE,
+                        "logout"
+                ).join();
+                webSocket = null;
+                System.out.println("WebSocket zamknięty");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -82,7 +82,9 @@ public class ChatController {
 
     public void logout() {
         TokenStorage.setUser(null);
+        TokenStorage.setCachedToken(null);
         TokenStorage.deleteToken();
+        webSocketService.disconnect();
         goToLogin.run();
     }
 

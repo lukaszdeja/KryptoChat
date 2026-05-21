@@ -40,10 +40,11 @@ public class ChatService {
         }
 
         try {
-            Long groupId = TokenStorage.getUser().getGroupId();
+            String token = TokenStorage.getCachedToken();
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/groups/" + groupId))
+                    .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/groups/"))
+                    .header("Authorization", "Bearer " + token)
                     .GET()
                     .build();
 
@@ -67,10 +68,11 @@ public class ChatService {
             return null;
         }
         try {
-            Long groupId = TokenStorage.getUser().getGroupId();
+            String token = TokenStorage.getCachedToken();
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/messages/" + groupId))
+                    .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/messages/"))
+                    .header("Authorization", "Bearer " + token)
                     .GET()
                     .build();
 
