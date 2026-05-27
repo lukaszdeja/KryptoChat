@@ -8,6 +8,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import Views.*;
 import Controllers.*;
+import security.KeyManager;
 import security.TokenStorage;
 
 /** class Main
@@ -57,6 +58,7 @@ public class Main extends Application {
         //showChats();
          //showCreateGroup();
         //showRegister();
+        KeyManager.generateKeysIfNeeded();
 
        String token =  TokenStorage.loadUser();
        if (token == null) {

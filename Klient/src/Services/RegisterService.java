@@ -8,6 +8,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import security.KeyManager;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,17 +34,22 @@ public class RegisterService {
 
         try {
 
+            register.setPublicKey(KeyManager.getPublicKeyString());
+
             ObjectMapper mapper = new ObjectMapper();
+
             String json = mapper.writeValueAsString(register);
+
             HttpClient client = HttpClient.newHttpClient();
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/register"))
                     .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(json)).build();
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            //System.out.println("Status: " + response.statusCode());
+            HttpResponse<String> response =
+                    client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if(response.statusCode() == 200) {
                 return new ServiceResponse(true, "Utworzono konto");
