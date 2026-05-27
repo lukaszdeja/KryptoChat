@@ -42,7 +42,13 @@ public class WebSocketService {
         manuallyDisconnected = false;
 
         if (webSocket != null) {
-            disconnect();
+            try {
+                webSocket.abort();
+            } catch (Exception e) {
+                System.out.println("Połączenie utracone: " + e.getMessage());
+            }
+
+            webSocket = null;
         }
 
         HttpClient client = HttpClient.newHttpClient();
@@ -62,6 +68,7 @@ public class WebSocketService {
                                 @Override
                                 public void onOpen(WebSocket webSocket) {
                                     System.out.println("Połączono z serwerem");
+                                    WebSocketService.this.webSocket = webSocket;
                                     webSocket.request(1);
                                 }
 
@@ -92,6 +99,7 @@ public class WebSocketService {
                                 @Override
                                 public void onError(WebSocket webSocket, Throwable error) {
                                     reconnect();
+                                    WebSocketService.this.webSocket = null;
                                     error.printStackTrace();
                                 }
 
@@ -100,6 +108,7 @@ public class WebSocketService {
                                                                   int statusCode,
                                                                   String reason) {
                                     System.out.println("WebSocket closed: " + statusCode + " " + reason);
+                                    WebSocketService.this.webSocket = null;
                                     if (!manuallyDisconnected) {
                                         reconnect();
                                     }
@@ -139,20 +148,21 @@ public class WebSocketService {
      */
     public void disconnect() {
         manuallyDisconnected = true;
-        try {
 
-            if (webSocket != null) {
-
+        if (webSocket != null) {
+            try {
                 webSocket.sendClose(
-                        WebSocket.NORMAL_CLOSURE, "logout").join();
-
-                webSocket = null;
-                System.out.println("WebSocket zamknięty");
+                        WebSocket.NORMAL_CLOSURE,
+                        "logout"
+                );
+            } catch (Exception e) {
+                System.out.println("Połączenie utracone: " + e.getMessage());
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            webSocket = null;
         }
+
+        System.out.println("WebSocket zamknięty");
     }
 
     private void reconnect() {
@@ -163,15 +173,20 @@ public class WebSocketService {
         reconnecting = true;
 
         new Thread(() -> {
-            try {
-                Thread.sleep(5000);
-                System.out.println("Ponowne łączenie...");
-                connect();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } finally {
-                reconnecting = false;
+            while (webSocket == null && !manuallyDisconnected) {
+                try {
+                    System.out.println("Ponowne łączenie...");
+                    connect();
+
+                    Thread.sleep(5000);
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    break;
+                }
             }
+
+            reconnecting = false;
         }).start();
     }
 
