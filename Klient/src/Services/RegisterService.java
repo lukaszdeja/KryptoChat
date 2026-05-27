@@ -1,16 +1,10 @@
 package Services;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import security.KeyManager;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -34,7 +28,7 @@ public class RegisterService {
 
         try {
 
-            register.setPublicKey(KeyManager.getPublicKeyString());
+            register.setPublicKey(CryptoService.getPublicKeyString());
 
             ObjectMapper mapper = new ObjectMapper();
 

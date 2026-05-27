@@ -4,11 +4,15 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.security.PublicKey;
 
 import Models.User;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import security.GroupKeyStorage;
 import security.TokenStorage;
+
+import javax.crypto.SecretKey;
 
 /**
  * Serwis odpowiedzialny za operacje na grupach:
@@ -37,10 +41,12 @@ public class GroupService {
     public ServiceResponse createGroup(String groupName) {
 
         try {
-
-            CreateGroupRequest requestBody = new CreateGroupRequest(groupName);
+            SecretKey key = CryptoService.generateAESKey();
+            PublicKey publicKey = CryptoService.getPublicKey();
+            String creatorKey = CryptoService.encryptRSA(key.getEncoded(), publicKey);
+            CreateGroupRequest requestBody = new CreateGroupRequest(groupName, creatorKey);
             String json = mapper.writeValueAsString(requestBody);
-
+            System.out.println(json);
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/groups/create"))
                     .header("Content-Type", "application/json")
@@ -52,6 +58,7 @@ public class GroupService {
             switch (response.statusCode()) {
 
                 case 200:
+                    GroupKeyStorage.save(key);
                     return new ServiceResponse(saveResponse(response), "Utworzono grupę");
 
                 default:

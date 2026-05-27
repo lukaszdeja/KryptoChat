@@ -1,14 +1,10 @@
 import Models.User;
 import Services.*;
 import javafx.application.Application;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import Views.*;
 import Controllers.*;
-import security.KeyManager;
 import security.TokenStorage;
 
 /** class Main
@@ -58,7 +54,7 @@ public class Main extends Application {
         //showChats();
          //showCreateGroup();
         //showRegister();
-        KeyManager.generateKeysIfNeeded();
+        CryptoService.generateKeysIfNeeded();
 
        String token =  TokenStorage.loadUser();
        if (token == null) {

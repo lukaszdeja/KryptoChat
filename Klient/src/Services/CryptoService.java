@@ -1,56 +1,89 @@
 package Services;
 
-import javax.crypto.*;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.nio.file.*;
-import java.security.*;
-import java.security.spec.*;
+
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+
 import java.util.Base64;
 
 public class CryptoService {
 
-    private static final Path PRIVATE_KEY = Paths.get(System.getProperty("user.home"), ".KryptoChatapp", "private.key");
+    private static final Path DIR = Paths.get(
+            System.getProperty("user.home"),
+            ".KryptoChatapp",
+            "keys"
+    );
 
-    public static KeyPair generateRSA() throws Exception {
+    private static final Path PRIVATE_KEY_PATH = DIR.resolve("private.key");
+    private static final Path PUBLIC_KEY_PATH = DIR.resolve("public.key");
+
+    private static final String RSA_TRANSFORMATION = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
+
+    private static final String AES_TRANSFORMATION = "AES/GCM/NoPadding";
+
+    private static final int AES_IV_LENGTH = 12;
+    private static final int AES_TAG_LENGTH = 128;
+
+
+    public static void generateKeysIfNeeded() throws Exception {
+
+        if (Files.exists(PRIVATE_KEY_PATH) && Files.exists(PUBLIC_KEY_PATH)) {
+            return;
+        }
+
+        Files.createDirectories(DIR);
 
         KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-
         generator.initialize(2048);
 
-        return generator.generateKeyPair();
+        KeyPair pair = generator.generateKeyPair();
+
+        saveKey(PRIVATE_KEY_PATH, pair.getPrivate().getEncoded());
+        saveKey(PUBLIC_KEY_PATH, pair.getPublic().getEncoded());
     }
 
-    public static void savePrivateKey(PrivateKey privateKey)
-            throws Exception {
-
-        Files.createDirectories(PRIVATE_KEY.getParent());
-
-        Files.write(PRIVATE_KEY, Base64.getEncoder().encode(privateKey.getEncoded()));
+    private static void saveKey(Path path, byte[] keyBytes) throws Exception {
+        Files.write(path, Base64.getEncoder().encode(keyBytes));
     }
 
-    public static PrivateKey loadPrivateKey()
-            throws Exception {
+    public static PublicKey getPublicKey() throws Exception {
+        byte[] bytes = Base64.getDecoder().decode(Files.readAllBytes(PUBLIC_KEY_PATH));
 
-        byte[] bytes = Base64.getDecoder().decode(
-                Files.readAllBytes(PRIVATE_KEY)
-        );
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(bytes);
 
-        PKCS8EncodedKeySpec spec =
-                new PKCS8EncodedKeySpec(bytes);
-
-        return KeyFactory.getInstance("RSA")
-                .generatePrivate(spec);
+        return KeyFactory.getInstance("RSA").generatePublic(spec);
     }
 
-    public static String publicKeyToString(PublicKey key) {
+    public static PrivateKey getPrivateKey() throws Exception {
+        byte[] bytes = Base64.getDecoder().decode(Files.readAllBytes(PRIVATE_KEY_PATH));
 
-        return Base64.getEncoder().encodeToString(key.getEncoded());
+        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(bytes);
+
+        return KeyFactory.getInstance("RSA").generatePrivate(spec);
     }
 
-    public static PublicKey stringToPublicKey(String key)
-            throws Exception {
+    public static String getPublicKeyString() throws Exception {
+        return Base64.getEncoder().encodeToString(getPublicKey().getEncoded());
+    }
 
+    public static PublicKey stringToPublicKey(String key) throws Exception {
         byte[] bytes = Base64.getDecoder().decode(key);
 
         X509EncodedKeySpec spec = new X509EncodedKeySpec(bytes);
@@ -58,79 +91,90 @@ public class CryptoService {
         return KeyFactory.getInstance("RSA").generatePublic(spec);
     }
 
-    public static SecretKey generateAES()
-            throws Exception {
 
+    public static SecretKey generateAESKey() throws Exception {
         KeyGenerator generator = KeyGenerator.getInstance("AES");
-
         generator.init(256);
-
         return generator.generateKey();
     }
 
-    public static String encryptAES(String text, SecretKey key)
-            throws Exception {
+    public static String aesKeyToString(SecretKey key) {
+        return Base64.getEncoder().encodeToString(key.getEncoded());
+    }
 
-        byte[] iv = new byte[12];
+    public static SecretKey stringToAESKey(String key) {
+        byte[] bytes = Base64.getDecoder().decode(key);
+        return new SecretKeySpec(bytes, "AES");
+    }
 
-        SecureRandom random = new SecureRandom();
-        random.nextBytes(iv);
+    public static String encryptAES(String text, SecretKey key) throws Exception {
 
-        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        byte[] iv = new byte[AES_IV_LENGTH];
+        new SecureRandom().nextBytes(iv);
 
-        cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(128, iv));
+        Cipher cipher = Cipher.getInstance(AES_TRANSFORMATION);
 
-        byte[] encrypted = cipher.doFinal(text.getBytes());
+        cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(AES_TAG_LENGTH, iv));
+
+        byte[] encrypted = cipher.doFinal(text.getBytes(StandardCharsets.UTF_8));
 
         byte[] combined = new byte[iv.length + encrypted.length];
 
         System.arraycopy(iv, 0, combined, 0, iv.length);
-
         System.arraycopy(encrypted, 0, combined, iv.length, encrypted.length);
 
         return Base64.getEncoder().encodeToString(combined);
     }
 
-    public static String decryptAES(String encrypted, SecretKey key)
-            throws Exception {
+    public static String decryptAES(String encrypted, SecretKey key) throws Exception {
 
         byte[] combined = Base64.getDecoder().decode(encrypted);
 
-        byte[] iv = new byte[12];
-        byte[] ciphertext = new byte[combined.length - 12];
+        byte[] iv = new byte[AES_IV_LENGTH];
+        byte[] ciphertext = new byte[combined.length - AES_IV_LENGTH];
 
-        System.arraycopy(combined, 0, iv, 0, 12);
+        System.arraycopy(combined, 0, iv, 0, AES_IV_LENGTH);
+        System.arraycopy(combined, AES_IV_LENGTH, ciphertext, 0, ciphertext.length);
 
-        System.arraycopy(combined, 12, ciphertext, 0, ciphertext.length);
+        Cipher cipher = Cipher.getInstance(AES_TRANSFORMATION);
 
-        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        cipher.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(AES_TAG_LENGTH, iv));
 
-        cipher.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(128, iv));
+        byte[] decrypted = cipher.doFinal(ciphertext);
 
-        return new String(cipher.doFinal(ciphertext));
+        return new String(decrypted, StandardCharsets.UTF_8);
     }
 
-    public static String encryptRSA(byte[] data, PublicKey key)
-            throws Exception {
 
-        Cipher cipher = Cipher.getInstance("RSA");
+    public static String encryptRSA(byte[] data, PublicKey publicKey) throws Exception {
 
-        cipher.init(Cipher.ENCRYPT_MODE, key);
+        Cipher cipher = Cipher.getInstance(RSA_TRANSFORMATION);
 
-        return Base64.getEncoder().encodeToString(cipher.doFinal(data));
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+
+        byte[] encrypted = cipher.doFinal(data);
+
+        return Base64.getEncoder().encodeToString(encrypted);
     }
 
-    public static byte[] decryptRSA(String encrypted, PrivateKey key)
-            throws Exception {
+    public static byte[] decryptRSA(String encrypted, PrivateKey privateKey) throws Exception {
 
-        Cipher cipher = Cipher.getInstance("RSA");
+        Cipher cipher = Cipher.getInstance(RSA_TRANSFORMATION);
 
-        cipher.init(Cipher.DECRYPT_MODE, key);
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
 
         return cipher.doFinal(Base64.getDecoder().decode(encrypted));
     }
 
-    public static SecretKey bytesToAES(byte[] bytes) {
-        return new SecretKeySpec(bytes, "AES");
+    public static String encryptGroupKey(SecretKey groupKey, PublicKey publicKey) throws Exception {
+
+        return encryptRSA(groupKey.getEncoded(), publicKey);
+    }
+
+    public static SecretKey decryptGroupKey(String encryptedGroupKey, PrivateKey privateKey) throws Exception {
+
+        byte[] keyBytes = decryptRSA(encryptedGroupKey, privateKey);
+
+        return new SecretKeySpec(keyBytes, "AES");
     }
 }

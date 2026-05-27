@@ -15,7 +15,9 @@ public class GroupRequest {
 class CreateGroupRequest extends GroupRequest {
 
     private String groupName;
-    public CreateGroupRequest(String groupName) {
+    private String creatorKey;
+    public CreateGroupRequest(String groupName, String key) {
+        this.creatorKey = key;
         this.groupName = groupName;
     }
     public CreateGroupRequest() {}
@@ -35,6 +37,9 @@ class CreateGroupRequest extends GroupRequest {
     public String getGroupName() {
         return groupName;
     }
+
+    public String getCreatorKey() { return creatorKey; }
+    public void setCreatorKey(String key) { this.creatorKey = key; }
 }
 
 /**
