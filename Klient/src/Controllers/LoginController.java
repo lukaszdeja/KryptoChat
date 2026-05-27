@@ -83,5 +83,14 @@ public class LoginController {
                 delay.play();
             }
         }
+        clearFields();
+    }
+
+    /**
+     * Czyści pola do wpisywania.
+     */
+    private void clearFields() {
+        loginView.getLogin().clear();
+        loginView.getPassword().clear();
     }
 }

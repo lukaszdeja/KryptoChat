@@ -74,7 +74,7 @@ public class ChatController {
         if(group == null) { return; }
 
         chatView.getGroupNameLabel().setText(group.getGroupName());
-        chatView.getGroupCodeLabel().setText(group.getCode());
+        chatView.getGroupCodeLabel().setText("Kod do dołączenia: "+group.getCode());
         chatView.getUserList().setItems(FXCollections.observableArrayList(group.getUsers()));
     }
 

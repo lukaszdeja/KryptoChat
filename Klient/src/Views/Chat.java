@@ -12,6 +12,7 @@ import javafx.scene.layout.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.application.Platform;
+import java.time.format.DateTimeFormatter;
 
 
 /**
@@ -72,17 +73,27 @@ public class Chat extends GridPane {
         // Użytkownicy
         groupNameLabel = new Label("");
         groupCodeLabel = new Label("Kod dolaczenia:");
-        HBox labele = new HBox(0, groupNameLabel, groupCodeLabel);
+
+        VBox labele = new VBox(5, groupNameLabel, groupCodeLabel);
+        labele.setPadding(new Insets(10));
+
         userList = new ListView<>();
         userList.setMinHeight(30);
         userList.getStyleClass().add("user-list");
-        groupCodeLabel.setPrefWidth(170);
-        groupCodeLabel.setAlignment(Pos.CENTER_RIGHT);
 
-        VBox userBox = new VBox(0, labele, userList);
+        groupNameLabel.setWrapText(true);
+
+        VBox groupInfoBox = new VBox(5, groupNameLabel, groupCodeLabel);
+        groupInfoBox.setPadding(new Insets(10));
+        groupInfoBox.getStyleClass().add("group-info-box");
+
+        // USER BOX
+        VBox userBox = new VBox(10, groupInfoBox, userList);
+
         userBox.getStyleClass().add("user-list");
+
         groupNameLabel.getStyleClass().add("group-name-label");
-        groupCodeLabel.getStyleClass().add("group-name-label");
+        groupCodeLabel.getStyleClass().add("group-code-label");
 
         // Wiadomości
         messages = FXCollections.observableArrayList();
@@ -103,6 +114,10 @@ public class Chat extends GridPane {
         });
 
         chatList.setCellFactory(param -> new ListCell<>() {
+
+            private final DateTimeFormatter formatter =
+                    DateTimeFormatter.ofPattern("HH:mm");
+
             @Override
             protected void updateItem(Message msg, boolean empty) {
                 super.updateItem(msg, empty);
@@ -110,8 +125,13 @@ public class Chat extends GridPane {
                 if (empty || msg == null) {
                     setText(null);
                 } else {
-                    // User.toString() zwraca username
-                    setText(msg.getSender() + ": " + msg.getContent());
+                    String time = "";
+
+                    if (msg.getSend_time() != null) {
+                        time = msg.getSend_time().format(formatter);
+                    }
+
+                    setText("[" + time + "] " + msg.getSender() + ": " + msg.getContent());
                 }
             }
         });

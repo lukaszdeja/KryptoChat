@@ -61,15 +61,22 @@
     -fx-text-fill: black;
 }
 
-.group-name-label {
-    -fx-background-color: transparent;
-    -fx-padding: 10 15;
-    -fx-font-size: 18px;
-    -fx-text-fill: black;
+.group-info-box {
+    -fx-background-color: #606695;
+    -fx-border-color: #444;
+    -fx-border-width: 0 0 1 0;
 }
 
+.group-name-label {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
 
-
+.group-code-label {
+    -fx-font-size: 15px;
+    -fx-text-fill: white;
+}
 
 .message {
     -fx-max-width: infinity;

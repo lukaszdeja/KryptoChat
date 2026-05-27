@@ -81,6 +81,7 @@ public class RegisterController {
             delay.setOnFinished(e -> goToLogin.run());
             delay.play();
         }
+        clearFields();
     }
 
     /**
@@ -94,5 +95,15 @@ public class RegisterController {
         String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).+$";
 
         return password.matches(regex);
+    }
+
+
+    /**
+     * Czyści pola do wpisywania.
+     */
+    private void clearFields() {
+        registerView.getLogin().clear();
+        registerView.getPassword().clear();
+        registerView.getPassword2().clear();
     }
 }

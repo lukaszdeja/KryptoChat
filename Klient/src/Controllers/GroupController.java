@@ -52,21 +52,26 @@ public class GroupController {
 
         if (groupName.isBlank()) {
             groupView.getMessage().setText("Nazwa grupy nie może być pusta");
+            clearFields();
             return;
         }
 
         if (groupName.length() > 20) {
             groupView.getMessage().setText("Nazwa grupy nie może mieć więcej niż 20 znaków");
+            clearFields();
             return;
         }
 
-        if (groupName.length() <= 3) {
+        if (groupName.length() < 3) {
             groupView.getMessage().setText("Nazwa grupy musi mieć conajmniej 3 znaki");
+            clearFields();
             return;
         }
 
         ServiceResponse response = groupService.createGroup(groupName);
         groupView.getMessage().setText(response.getMessage());
+
+        clearFields();
 
         if (response.isSuccess()) {
             PauseTransition delay = new PauseTransition(Duration.seconds(2));
@@ -75,7 +80,6 @@ public class GroupController {
             delay.play();
         }
 
-        clearFields();
     }
 
     /**
@@ -87,26 +91,27 @@ public class GroupController {
 
         if (code.isBlank()) {
             groupView.getMessage().setText("Kod grupy nie może być pusty");
+            clearFields();
             return;
         }
 
         ServiceResponse response = groupService.joinGroup(code);
         groupView.getMessage().setText(response.getMessage());
 
+        clearFields();
+
         if (response.isSuccess()) {
             PauseTransition delay = new PauseTransition(Duration.seconds(2));
             delay.setOnFinished(e -> goToChats.run());
             delay.play();
         }
-
-        clearFields();
     }
 
     /**
      * Czyści pola do wpisywania.
      */
     private void clearFields() {
-        groupView.getGroupNameField().setText("");
-        groupView.getCodeField().setText("");
+        groupView.getGroupNameField().clear();
+        groupView.getCodeField().clear();
     }
 }
