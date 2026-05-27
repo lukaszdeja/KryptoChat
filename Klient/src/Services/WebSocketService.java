@@ -1,5 +1,6 @@
 package Services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import Models.Message;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -20,6 +21,12 @@ public class WebSocketService {
     /** Aktywne połączenie WebSocket */
     private WebSocket webSocket;
 
+
+    private volatile boolean reconnecting = false;
+
+    private volatile boolean manuallyDisconnected = false;
+
+
     /** Mapper JSON do serializacji i deserializacji wiadomości */
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -31,6 +38,8 @@ public class WebSocketService {
      * Jeśli istnieje już aktywne połączenie, zostaje ono zamknięte.
      */
     public void connect() {
+
+        manuallyDisconnected = false;
 
         if (webSocket != null) {
             disconnect();
@@ -82,6 +91,7 @@ public class WebSocketService {
 
                                 @Override
                                 public void onError(WebSocket webSocket, Throwable error) {
+                                    reconnect();
                                     error.printStackTrace();
                                 }
 
@@ -90,6 +100,9 @@ public class WebSocketService {
                                                                   int statusCode,
                                                                   String reason) {
                                     System.out.println("WebSocket closed: " + statusCode + " " + reason);
+                                    if (!manuallyDisconnected) {
+                                        reconnect();
+                                    }
                                     return null;
                                 }
                             }
@@ -107,13 +120,16 @@ public class WebSocketService {
      * @param message wiadomość do wysłania
      */
     public void send(Message message) {
-
+        if (webSocket == null) {
+            System.out.println("Brak polaczenia z serwerem");
+            return;
+        }
         try {
 
             String json = mapper.writeValueAsString(message);
             webSocket.sendText(json, true);
 
-        } catch (Exception e) {
+        } catch (NullPointerException | JsonProcessingException e) {
             e.printStackTrace();
         }
     }
@@ -122,7 +138,7 @@ public class WebSocketService {
      * Zamyka aktywne połączenie WebSocket.
      */
     public void disconnect() {
-
+        manuallyDisconnected = true;
         try {
 
             if (webSocket != null) {
@@ -137,6 +153,26 @@ public class WebSocketService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void reconnect() {
+        if (reconnecting || manuallyDisconnected) {
+            return;
+        }
+
+        reconnecting = true;
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(5000);
+                System.out.println("Ponowne łączenie...");
+                connect();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                reconnecting = false;
+            }
+        }).start();
     }
 
     /**
