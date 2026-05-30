@@ -80,6 +80,7 @@ public class WebSocketService {
                                 public void onOpen(WebSocket webSocket) {
                                     System.out.println("Połączono z serwerem");
                                     WebSocketService.this.webSocket = webSocket;
+                                    handleKeyReady();
                                     webSocket.request(1);
                                 }
 
@@ -108,6 +109,7 @@ public class WebSocketService {
                                             case "KEY_READY" -> {
                                                 handleKeyReady();
                                             }
+                                            default -> {System.out.println("Cos nie tak");}
                                         }
 
                                     } catch (Exception e) {
@@ -201,7 +203,9 @@ public class WebSocketService {
     }
 
     private void handleKeyReady() {
+        System.out.println("Key received");
         try {
+
             HttpRequest req = HttpRequest.newBuilder()
                     .uri(URI.create(url + "/api/groups/my-key"))
                     .header("Authorization",
