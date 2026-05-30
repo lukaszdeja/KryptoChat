@@ -42,7 +42,7 @@ public class GroupService {
 
         try {
             SecretKey key = CryptoService.generateAESKey();
-            PublicKey publicKey = CryptoService.getPublicKey();
+            PublicKey publicKey = CryptoService.getPublicKey(TokenStorage.getUser().getUsername());
             String creatorKey = CryptoService.encryptRSA(key.getEncoded(), publicKey);
             CreateGroupRequest requestBody = new CreateGroupRequest(groupName, creatorKey);
             String json = mapper.writeValueAsString(requestBody);
@@ -58,7 +58,7 @@ public class GroupService {
             switch (response.statusCode()) {
 
                 case 200:
-                    GroupKeyStorage.save(key);
+                    GroupKeyStorage.save(TokenStorage.getUser().getUsername(), key);
                     return new ServiceResponse(saveResponse(response), "Utworzono grupę");
 
                 default:

@@ -54,13 +54,13 @@ public class Main extends Application {
         //showChats();
          //showCreateGroup();
         //showRegister();
-        CryptoService.generateKeysIfNeeded();
 
        String token =  TokenStorage.loadUser();
        if (token == null) {
             showLogin();
        } else {
            User user = authService.checkUser(token);
+           TokenStorage.setUser(user);
            if (user == null) {
                showLogin();
            } else {

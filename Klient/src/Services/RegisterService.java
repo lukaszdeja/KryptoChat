@@ -4,6 +4,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.security.KeyPair;
+import java.util.Base64;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -28,7 +30,10 @@ public class RegisterService {
 
         try {
 
-            register.setPublicKey(CryptoService.getPublicKeyString());
+            KeyPair keyPair = CryptoService.generateKeysIfNeeded(username);
+            String publicKey = Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());
+
+            register.setPublicKey(publicKey);
 
             ObjectMapper mapper = new ObjectMapper();
 
@@ -46,6 +51,9 @@ public class RegisterService {
                     client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if(response.statusCode() == 200) {
+                if (keyPair != null) {
+                    CryptoService.saveKeyPair(username, keyPair);
+                }
                 return new ServiceResponse(true, "Utworzono konto");
             }
 

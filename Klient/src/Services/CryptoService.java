@@ -25,14 +25,11 @@ import java.util.Base64;
 
 public class CryptoService {
 
-    private static final Path DIR = Paths.get(
-            System.getProperty("user.home"),
-            ".KryptoChatapp",
-            "keys"
-    );
 
-    private static final Path PRIVATE_KEY_PATH = DIR.resolve("private.key");
-    private static final Path PUBLIC_KEY_PATH = DIR.resolve("public.key");
+    public static Path getDIR(String username) {
+        return Paths.get(System.getProperty("user.home"), ".KryptoChatapp", "keys", username);
+    }
+
 
     private static final String RSA_TRANSFORMATION = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
 
@@ -42,45 +39,48 @@ public class CryptoService {
     private static final int AES_TAG_LENGTH = 128;
 
 
-    public static void generateKeysIfNeeded() throws Exception {
-
-        if (Files.exists(PRIVATE_KEY_PATH) && Files.exists(PUBLIC_KEY_PATH)) {
-            return;
+    public static KeyPair generateKeysIfNeeded(String username) throws Exception {
+        Path dir = getDIR(username);
+        Path privatePath = dir.resolve("private.key");
+        Path publicPath = dir.resolve("public.key");
+        if (Files.exists(privatePath) && Files.exists(publicPath)) {
+            return null;
         }
-
-        Files.createDirectories(DIR);
 
         KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
         generator.initialize(2048);
 
         KeyPair pair = generator.generateKeyPair();
-
-        saveKey(PRIVATE_KEY_PATH, pair.getPrivate().getEncoded());
-        saveKey(PUBLIC_KEY_PATH, pair.getPublic().getEncoded());
+        return pair;
     }
 
-    private static void saveKey(Path path, byte[] keyBytes) throws Exception {
-        Files.write(path, Base64.getEncoder().encode(keyBytes));
+    public static void saveKeyPair(String username, KeyPair pair) throws Exception {
+        Path dir = getDIR(username);
+        Files.createDirectories(dir);
+        Files.write(dir.resolve("private.key"), Base64.getEncoder().encode(pair.getPrivate().getEncoded()));
+        Files.write(dir.resolve("public.key"), Base64.getEncoder().encode(pair.getPublic().getEncoded()));
     }
 
-    public static PublicKey getPublicKey() throws Exception {
-        byte[] bytes = Base64.getDecoder().decode(Files.readAllBytes(PUBLIC_KEY_PATH));
+    public static PublicKey getPublicKey(String username) throws Exception {
+        Path path = getDIR(username).resolve("public.key");
+        byte[] bytes = Base64.getDecoder().decode(Files.readAllBytes(path));
 
         X509EncodedKeySpec spec = new X509EncodedKeySpec(bytes);
 
         return KeyFactory.getInstance("RSA").generatePublic(spec);
     }
 
-    public static PrivateKey getPrivateKey() throws Exception {
-        byte[] bytes = Base64.getDecoder().decode(Files.readAllBytes(PRIVATE_KEY_PATH));
+    public static PrivateKey getPrivateKey(String username) throws Exception {
+        Path path = getDIR(username).resolve("private.key");
+        byte[] bytes = Base64.getDecoder().decode(Files.readAllBytes(path));
 
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(bytes);
 
         return KeyFactory.getInstance("RSA").generatePrivate(spec);
     }
 
-    public static String getPublicKeyString() throws Exception {
-        return Base64.getEncoder().encodeToString(getPublicKey().getEncoded());
+    public static String getPublicKeyString(String username) throws Exception {
+        return Base64.getEncoder().encodeToString(getPublicKey(username).getEncoded());
     }
 
     public static PublicKey stringToPublicKey(String key) throws Exception {

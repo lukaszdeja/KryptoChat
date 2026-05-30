@@ -7,31 +7,30 @@ import java.util.Base64;
 
 public class GroupKeyStorage {
 
-    private static final Path KEY_FILE = Paths.get(
-            System.getProperty("user.home"),
-            ".KryptoChatapp",
-            "group.key"
-    );
-
-    public static void save(SecretKey key) throws Exception {
-
-        Files.createDirectories(KEY_FILE.getParent());
-
-        Files.write(KEY_FILE, Base64.getEncoder().encode(key.getEncoded()));
+    public static Path getPath(String username) {
+        return Paths.get(System.getProperty("user.home"), ".KryptoChatapp/keys", username, "group.key");
     }
 
-    public static SecretKey load() throws Exception {
 
-        byte[] bytes = Base64.getDecoder().decode(Files.readAllBytes(KEY_FILE));
+    public static void save(String username, SecretKey key) throws Exception {
+
+        Files.createDirectories(getPath(username).getParent());
+
+        Files.write(getPath(username), Base64.getEncoder().encode(key.getEncoded()));
+    }
+
+    public static SecretKey load(String username) throws Exception {
+
+        byte[] bytes = Base64.getDecoder().decode(Files.readAllBytes(getPath(username)));
 
         return new SecretKeySpec(bytes, "AES");
     }
 
-    public static boolean exists() {
-        return Files.exists(KEY_FILE);
+    public static boolean exists(String username) {
+        return Files.exists(getPath(username));
     }
 
-    public static void delete() throws Exception {
-        Files.deleteIfExists(KEY_FILE);
+    public static void delete(String username) throws Exception {
+        Files.deleteIfExists(getPath(username));
     }
 }
