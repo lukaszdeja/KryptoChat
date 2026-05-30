@@ -3,7 +3,9 @@ package Services;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import java.nio.charset.StandardCharsets;
@@ -21,6 +23,7 @@ import java.security.SecureRandom;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
+import java.util.Arrays;
 import java.util.Base64;
 
 public class CryptoService {
@@ -89,6 +92,14 @@ public class CryptoService {
         X509EncodedKeySpec spec = new X509EncodedKeySpec(bytes);
 
         return KeyFactory.getInstance("RSA").generatePublic(spec);
+    }
+
+    public static boolean keysExist(String username) {
+        Path path = getDIR(username);
+        if (Files.exists(path.resolve("public.key")) && Files.exists(path.resolve("private.key"))) {
+            return true;
+        }
+        return false;
     }
 
 
@@ -176,5 +187,38 @@ public class CryptoService {
         byte[] keyBytes = decryptRSA(encryptedGroupKey, privateKey);
 
         return new SecretKeySpec(keyBytes, "AES");
+    }
+
+    public static String encryptPrivateKeyWithPassword(PrivateKey privateKey, String password) throws Exception {
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        byte[] salt = new byte[16];
+        new SecureRandom().nextBytes(salt);
+        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 310_000, 256);
+        byte[] rawKey = factory.generateSecret(spec).getEncoded();
+        SecretKey aesKey = new SecretKeySpec(rawKey, "AES");
+        byte[] iv = new byte[12];
+        new SecureRandom().nextBytes(iv);
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        cipher.init(Cipher.ENCRYPT_MODE, aesKey, new GCMParameterSpec(128, iv));
+        byte[] encrypted = cipher.doFinal(privateKey.getEncoded());
+        byte[] combined = new byte[16 + 12 + encrypted.length];
+        System.arraycopy(salt,0, combined, 0,  16);
+        System.arraycopy(iv,0, combined, 16, 12);
+        System.arraycopy(encrypted,0, combined, 28, encrypted.length);
+        return Base64.getEncoder().encodeToString(combined);
+    }
+
+    public static PrivateKey decryptPrivateKeyWithPassword(String encrypted, String password) throws Exception {
+        byte[] combined = Base64.getDecoder().decode(encrypted);
+        byte[] salt = Arrays.copyOfRange(combined, 0,  16);
+        byte[] iv = Arrays.copyOfRange(combined, 16, 28);
+        byte[] ciphertext = Arrays.copyOfRange(combined, 28, combined.length);
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 310_000, 256);
+        SecretKey aesKey = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        cipher.init(Cipher.DECRYPT_MODE, aesKey, new GCMParameterSpec(128, iv));
+        byte[] keyBytes = cipher.doFinal(ciphertext);
+        return KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(keyBytes));
     }
 }

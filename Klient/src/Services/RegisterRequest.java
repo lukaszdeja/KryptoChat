@@ -9,6 +9,7 @@ public class RegisterRequest {
     private String username;
     private String password;
     private String publicKey;
+    private String encryptedPrivateKey;
     public RegisterRequest() {}
     public String getUsername() { return this.username; }
     public String getPassword() { return this.password; }
@@ -22,4 +23,8 @@ public class RegisterRequest {
     public void setPublicKey(String key) {
         this.publicKey = key;
     }
+    public void setEncryptedPrivateKey(String key) {
+        encryptedPrivateKey = key;
+    }
+    public String getEncryptedPrivateKey() { return encryptedPrivateKey; }
 }

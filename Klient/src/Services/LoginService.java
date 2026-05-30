@@ -8,6 +8,10 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+
 import security.TokenStorage;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -61,7 +65,22 @@ public class LoginService {
                 }
 
                 User user = mapper.treeToValue(tokenNode, User.class);
-
+                JsonNode encPrivKey = node.get("encryptedPrivateKey");
+                JsonNode pubKey = node.get("publicKey");
+                System.out.println(encPrivKey.asText());
+                System.out.println(pubKey.asText());
+                if (encPrivKey != null && pubKey != null) {
+                    if (!CryptoService.keysExist(username)) {
+                        try {
+                            PrivateKey privateKey = CryptoService.decryptPrivateKeyWithPassword(encPrivKey.asText(), password);
+                            PublicKey publicKey = CryptoService.stringToPublicKey(pubKey.asText());
+                            CryptoService.saveKeyPair(username, new KeyPair(publicKey, privateKey));
+                        } catch (Exception e) {
+                            System.out.println("Nie udalo sie odzyskac kluczy");
+                            e.printStackTrace();
+                        }
+                    }
+                }
                 TokenStorage.setUser(user);
                 TokenStorage.saveToken(token);
 

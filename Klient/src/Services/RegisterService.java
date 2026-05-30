@@ -29,18 +29,13 @@ public class RegisterService {
         register.setPassword(password);
 
         try {
-
             KeyPair keyPair = CryptoService.generateKeysIfNeeded(username);
             String publicKey = Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());
-
             register.setPublicKey(publicKey);
-
+            register.setEncryptedPrivateKey(CryptoService.encryptPrivateKeyWithPassword(keyPair.getPrivate(), password));
             ObjectMapper mapper = new ObjectMapper();
-
             String json = mapper.writeValueAsString(register);
-
             HttpClient client = HttpClient.newHttpClient();
-
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/register"))
                     .header("Content-Type", "application/json")
