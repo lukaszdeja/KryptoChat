@@ -67,8 +67,6 @@ public class LoginService {
                 User user = mapper.treeToValue(tokenNode, User.class);
                 JsonNode encPrivKey = node.get("encryptedPrivateKey");
                 JsonNode pubKey = node.get("publicKey");
-                System.out.println(encPrivKey.asText());
-                System.out.println(pubKey.asText());
                 if (encPrivKey != null && pubKey != null) {
                     if (!CryptoService.keysExist(username)) {
                         try {

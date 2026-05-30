@@ -3,6 +3,7 @@ package Services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import Models.Message;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import security.TokenStorage;
 
@@ -11,6 +12,16 @@ import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Consumer;
+import com.fasterxml.jackson.databind.JsonNode;
+import security.GroupKeyStorage;
+
+import javax.crypto.SecretKey;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.security.PublicKey;
+import java.security.PrivateKey;
+import java.util.Map;
+
 
 /**
  * Serwis odpowiedzialny za komunikację WebSocket z serwerem czatu.
@@ -20,7 +31,9 @@ public class WebSocketService {
 
     /** Aktywne połączenie WebSocket */
     private WebSocket webSocket;
+    private static final String url = "https://kryptochatserwer-production.up.railway.app";
 
+    private final HttpClient client = HttpClient.newHttpClient();
 
     private volatile boolean reconnecting = false;
 
@@ -51,8 +64,6 @@ public class WebSocketService {
             webSocket = null;
         }
 
-        HttpClient client = HttpClient.newHttpClient();
-
         mapper.registerModule(new JavaTimeModule());
 
         try {
@@ -78,13 +89,25 @@ public class WebSocketService {
                                         CharSequence data,
                                         boolean last
                                 ) {
-
                                     try {
+                                        JsonNode node = mapper.readTree(data.toString());
 
-                                        Message message = mapper.readValue(data.toString(), Message.class);
-
-                                        if (onMessageReceived != null) {
-                                            onMessageReceived.accept(message);
+                                        String type = node.has("type") ? node.get("type").asText() : "CHAT";
+                                        switch (type) {
+                                            case "CHAT" -> {
+                                                Message message = mapper.treeToValue(node, Message.class);
+                                                if (onMessageReceived != null) {
+                                                    onMessageReceived.accept(message);
+                                                }
+                                            }
+                                            case "KEY_REQUEST" -> {
+                                                long targetUserId = node.get("userId").asLong();
+                                                String targetPubKey = node.get("publicKey").asText();
+                                                handleKeyRequest(targetUserId, targetPubKey);
+                                            }
+                                            case "KEY_READY" -> {
+                                                handleKeyReady();
+                                            }
                                         }
 
                                     } catch (Exception e) {
@@ -92,7 +115,6 @@ public class WebSocketService {
                                     }
 
                                     webSocket.request(1);
-
                                     return null;
                                 }
 
@@ -134,11 +156,69 @@ public class WebSocketService {
             return;
         }
         try {
-
-            String json = mapper.writeValueAsString(message);
+            ObjectNode node = mapper.createObjectNode();
+            node.put("type", "CHAT");
+            node.put("groupId", message.getGroupId());
+            node.put("content", message.getContent());
+            String json = mapper.writeValueAsString(node);
             webSocket.sendText(json, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-        } catch (NullPointerException | JsonProcessingException e) {
+    private void handleKeyRequest(Long targetUserId, String targetPubKeyString) {
+        try {
+            SecretKey myGroupKey = GroupKeyStorage.load(TokenStorage.getUser().getUsername());
+            PublicKey targetPubKey = CryptoService.stringToPublicKey(targetPubKeyString);
+            String encryptedKey = CryptoService.encryptGroupKey(myGroupKey, targetPubKey);
+
+            Map<String, Object> body = Map.of(
+                    "targetUserId", targetUserId,
+                    "encryptedKey", encryptedKey
+            );
+
+            HttpRequest req = HttpRequest.newBuilder()
+                    .uri(URI.create(url + "/api/groups/deliver-key"))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization",
+                            "Bearer " + TokenStorage.getCachedToken())
+                    .POST(HttpRequest.BodyPublishers.ofString(
+                            mapper.writeValueAsString(body)))
+                    .build();
+
+            HttpResponse<String> response = client.send(req, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                System.out.println("Klucz dostarczony dla usera: " + targetUserId);
+            } else {
+                System.out.println("Blad dostarczania klucza");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handleKeyReady() {
+        try {
+            HttpRequest req = HttpRequest.newBuilder()
+                    .uri(URI.create(url + "/api/groups/my-key"))
+                    .header("Authorization",
+                            "Bearer " + TokenStorage.getCachedToken())
+                    .GET()
+                    .build();
+
+            HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString());
+
+            if (resp.statusCode() == 200 && !"PENDING".equals(resp.body())) {
+                PrivateKey privateKey = CryptoService.getPrivateKey(TokenStorage.getUser().getUsername());
+                SecretKey groupKey = CryptoService.decryptGroupKey(resp.body(), privateKey);
+                GroupKeyStorage.save(TokenStorage.getUser().getUsername(), groupKey);
+                System.out.println("Klucz grupy odebrany i zapisany");
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
