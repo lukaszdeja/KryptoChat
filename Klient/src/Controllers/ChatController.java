@@ -2,6 +2,7 @@ package Controllers;
 
 import Models.Group;
 import Services.ChatService;
+import Services.CryptoService;
 import Services.WebSocketService;
 import Views.Chat;
 import Models.Message;
@@ -9,7 +10,10 @@ import Models.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ListCell;
+import security.GroupKeyStorage;
 import security.TokenStorage;
+
+import javax.crypto.SecretKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDateTime;
@@ -59,10 +63,20 @@ public class ChatController {
         loadGroup();
         loadMessages();
 
-        webSocketService.connect();
         webSocketService.setOnMessageReceived(message -> {
             Platform.runLater(() -> { chatView.getMessages().add(message); });
         });
+
+        webSocketService.setOnKeyReceived(() -> {
+            Platform.runLater(() -> {
+                chatView.getMessageField().setDisable(false);
+                chatView.getSendButton().setDisable(false);
+                chatView.getMessageField().setPromptText("Napisz wiadomość...");
+                loadMessages();
+            });
+        });
+
+        webSocketService.connect();
     }
 
     /**
@@ -82,13 +96,33 @@ public class ChatController {
      * Ładuje historię wiadomości i wyświetla ją w widoku.
      */
     public void loadMessages() {
+        if (!GroupKeyStorage.exists(TokenStorage.getUser().getUsername())) {
+            chatView.getMessageField().setDisable(true);
+            chatView.getSendButton().setDisable(true);
+            chatView.getMessageField().setPromptText("Oczekiwanie na klucz grupy...");
+        }
         List<Message> messages = chatService.loadMessages();
 
         chatView.getMessages().clear();
 
         if (messages != null) {
+            try {
+                SecretKey aesKey = GroupKeyStorage.load(TokenStorage.getUser().getUsername());
+                for (Message msg : messages) {
+                    try {
+                        msg.setContent(CryptoService.decryptAES(msg.getContent(), aesKey));
+                    } catch (Exception e) {
+                        System.out.println("Nie udalo sie odszyfrowac tej wiadomosci");
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Brak klucza - nie udalo sie odszyfrowac wiadomosci z historii");
+                e.printStackTrace();
+            }
             chatView.getMessages().addAll(messages);
         }
+
+
     }
 
     /**

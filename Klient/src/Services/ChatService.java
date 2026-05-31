@@ -22,7 +22,7 @@ public class ChatService {
 
     private final HttpClient client = HttpClient.newHttpClient();
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     /**
      * Pobiera dane grupy zalogowanego użytkownika.
@@ -87,7 +87,6 @@ public class ChatService {
 
                 JsonNode root = mapper.readTree(response.body());
                 JsonNode messagesNode = root.get("messages");
-                mapper.registerModule(new JavaTimeModule());
 
                 List<Message> messages = mapper.readValue(
                         messagesNode.toString(),

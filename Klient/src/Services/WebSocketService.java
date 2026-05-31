@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import Models.Message;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.sun.javafx.css.parser.Token;
 import security.TokenStorage;
 
 import java.net.URI;
@@ -46,6 +47,12 @@ public class WebSocketService {
     /** Callback wywoływany po otrzymaniu nowej wiadomości */
     private Consumer<Message> onMessageReceived;
 
+    private Runnable onKeyReceived;
+
+    public void setOnKeyReceived(Runnable callback) {
+        this.onKeyReceived = callback;
+    }
+
     /**
      * Nawiązuje połączenie WebSocket z serwerem czatu.
      * Jeśli istnieje już aktywne połączenie, zostaje ono zamknięte.
@@ -80,7 +87,10 @@ public class WebSocketService {
                                 public void onOpen(WebSocket webSocket) {
                                     System.out.println("Połączono z serwerem");
                                     WebSocketService.this.webSocket = webSocket;
-                                    handleKeyReady();
+                                    if (!GroupKeyStorage.exists(TokenStorage.getUser().getUsername())) {
+                                        handleKeyReady();
+                                    }
+
                                     webSocket.request(1);
                                 }
 
@@ -97,6 +107,13 @@ public class WebSocketService {
                                         switch (type) {
                                             case "CHAT" -> {
                                                 Message message = mapper.treeToValue(node, Message.class);
+                                                try {
+                                                    SecretKey aesKey = GroupKeyStorage.load(TokenStorage.getUser().getUsername());
+                                                    message.setContent(CryptoService.decryptAES(message.getContent(), aesKey));
+                                                } catch (Exception e) {
+                                                    System.out.println("Nie udalo sie odszyfrowac");
+                                                    e.printStackTrace();
+                                                }
                                                 if (onMessageReceived != null) {
                                                     onMessageReceived.accept(message);
                                                 }
@@ -158,12 +175,16 @@ public class WebSocketService {
             return;
         }
         try {
-            ObjectNode node = mapper.createObjectNode();
-            node.put("type", "CHAT");
-            node.put("groupId", message.getGroupId());
-            node.put("content", message.getContent());
-            String json = mapper.writeValueAsString(node);
-            webSocket.sendText(json, true);
+            if (GroupKeyStorage.exists(TokenStorage.getUser().getUsername())) {
+                ObjectNode node = mapper.createObjectNode();
+                SecretKey aesKey = GroupKeyStorage.load(TokenStorage.getUser().getUsername());
+                String encryptedMessage = CryptoService.encryptAES(message.getContent(), aesKey);
+                node.put("type", "CHAT");
+                node.put("groupId", message.getGroupId());
+                node.put("content", encryptedMessage);
+                String json = mapper.writeValueAsString(node);
+                webSocket.sendText(json, true);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -220,6 +241,10 @@ public class WebSocketService {
                 SecretKey groupKey = CryptoService.decryptGroupKey(resp.body(), privateKey);
                 GroupKeyStorage.save(TokenStorage.getUser().getUsername(), groupKey);
                 System.out.println("Klucz grupy odebrany i zapisany");
+
+                if (onKeyReceived != null) {
+                    onKeyReceived.run();
+                }
             }
 
         } catch (Exception e) {
