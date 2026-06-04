@@ -37,27 +37,27 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.17.2</version>
         </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>2.17.2</version>
         </dependency>
+
+        <!-- WebSocket (Spring client API) -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-websocket</artifactId>
             <version>6.1.0</version>
         </dependency>
 
-
     </dependencies>
 
     <build>
 
-        <sourceDirectory>src</sourceDirectory>
-
         <resources>
             <resource>
-                <directory>resources</directory>
+                <directory>src/main/resources</directory>
             </resource>
         </resources>
 
@@ -73,7 +73,7 @@
                 </configuration>
             </plugin>
 
-            <!-- MANIFEST FIX (TO NAPRAWIA "no main manifest attribute") -->
+            <!-- SHADE (JAR executable) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -89,7 +89,8 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>Main</mainClass>
+                                    <!-- 🔥 TU MUSI BYĆ PEŁNA NAZWA KLASY -->
+                                    <mainClass>com.KryptoChat.Main</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
@@ -97,13 +98,14 @@
                 </executions>
             </plugin>
 
-            <!-- JAVA FX RUN (DEV) -->
+            <!-- JavaFX RUN -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
+
                 <configuration>
-                    <mainClass>Main</mainClass>
+                    <mainClass>com.KryptoChat.Main</mainClass>
                 </configuration>
             </plugin>
 
