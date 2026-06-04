@@ -25,37 +25,52 @@ import java.util.Map;
 
 
 /**
- * Serwis odpowiedzialny za komunikację WebSocket z serwerem czatu.
- * Obsługuje połączenie, wysyłanie oraz odbieranie wiadomości.
+ * Serwis odpowiedzialny za dwukierunkową komunikację cyfrową za pomocą WebSocket.
+ * Obsługuje zarządzanie stanem połączenia, automatyczne wznawianie sesji,
+ * dystrybucję kluczy kryptograficznych oraz bezpieczną wymianę wiadomości czatu.
  */
 public class WebSocketService {
 
     /** Aktywne połączenie WebSocket */
     private WebSocket webSocket;
+
+    /** Bazowy URL serwera API */
     private static final String url = "https://kryptochatserwer-production.up.railway.app";
 
+    /** Klient HTTP używany do inicjalizacji WebSocket i zapytań REST */
     private final HttpClient client = HttpClient.newHttpClient();
 
+    /** Flaga określająca, czy proces automatycznego reconnectu jest obecnie aktywny */
     private volatile boolean reconnecting = false;
 
+    /** Flaga informująca, czy rozłączenie nastąpiło celowo ze strony użytkownika (np. wylogowanie) */
     private volatile boolean manuallyDisconnected = false;
 
-
-    /** Mapper JSON do serializacji i deserializacji wiadomości */
+    /** Mapper JSON do serializacji i deserializacji obiektów wiadomości oraz konfiguracji */
     private final ObjectMapper mapper = new ObjectMapper();
 
-    /** Callback wywoływany po otrzymaniu nowej wiadomości */
+    /** Callback wywoływany w warstwie UI po pomyślnym odebraniu i odszyfrowaniu wiadomości tekstowej */
     private Consumer<Message> onMessageReceived;
 
+    /** Callback informujący aplikację o poprawnym odebraniu klucza szyfrującego grupę */
     private Runnable onKeyReceived;
 
+    /**
+     * Rejestruje akcję zwrotną dla zdarzenia odebrania nowego klucza szyfrującego.
+     * * @param callback obiekt typu Runnable do wykonania po pobraniu klucza
+     */
     public void setOnKeyReceived(Runnable callback) {
         this.onKeyReceived = callback;
     }
 
     /**
-     * Nawiązuje połączenie WebSocket z serwerem czatu.
-     * Jeśli istnieje już aktywne połączenie, zostaje ono zamknięte.
+     * Nawiązuje asynchroniczne połączenie WebSocket z serwerem czatu.
+     *
+     * Proces:
+     * - przerywa istniejące, niestabilne połączenia,
+     * - konfiguruje moduł obsługi czasu Jackson (JavaTimeModule),
+     * - wstrzykuje token autoryzacyjny Bearer do nagłówka,
+     * - definiuje asynchroniczny nasłuchiwacz zdarzeń sieciowych (otwarcie, tekst, błąd, zamknięcie).
      */
     public void connect() {
 
@@ -166,8 +181,15 @@ public class WebSocketService {
     }
 
     /**
-     * Wysyła wiadomość przez WebSocket do serwera.
-     * @param message wiadomość do wysłania
+     * Szyfruje oraz wysyła wiadomość tekstową użytkownika do serwera.
+     *
+     * Proces:
+     * - sprawdza dostępność połączenia sieciowego,
+     * - weryfikuje istnienie lokalnego klucza grupy,
+     * - szyfruje treść wiadomości algorytmem AES,
+     * - opakowuje dane w strukturę JSON typu CHAT i wysyła strumień tekstu.
+     *
+     * @param message obiekt wiadomości zawierający identyfikator grupy oraz treść jawna
      */
     public void send(Message message) {
         if (webSocket == null) {
@@ -190,6 +212,18 @@ public class WebSocketService {
         }
     }
 
+    /**
+     * Realizuje bezpieczne przekazanie klucza szyfrującego grupę dla nowego członka.
+     *
+     * Proces:
+     * - wczytuje tajny klucz grupy obecnego użytkownika,
+     * - konwertuje tekstowy klucz publiczny odbiorcy na obiekt PublicKey,
+     * - szyfruje klucz grupy kluczem publicznym odbiorcy (asymetrycznie),
+     * - wysyła zaszyfrowany pakiet żądaniem POST pod punkt końcowy /deliver-key.
+     *
+     * @param targetUserId identyfikator użytkownika, który wnioskuje o dostęp do klucza grupy
+     * @param targetPubKeyString klucz publiczny wnioskodawcy zakodowany tekstowo
+     */
     private void handleKeyRequest(Long targetUserId, String targetPubKeyString) {
         try {
             SecretKey myGroupKey = GroupKeyStorage.load(TokenStorage.getUser().getUsername());
@@ -223,6 +257,16 @@ public class WebSocketService {
         }
     }
 
+    /**
+     * Pobiera przyznany dla użytkownika klucz grupy z serwera po otrzymaniu powiadomienia.
+     *
+     * Proces:
+     * - wysyła zapytanie GET żądające klucza powiązanego z sesją,
+     * - odrzuca odpowiedzi o statusie oczekiwania (PENDING),
+     * - deszyfruje pobrany klucz grupy za pomocą prywatnego klucza asymetrycznego użytkownika,
+     * - zapisuje odkodowany klucz w lokalnej bezpiecznej pamięci GroupKeyStorage,
+     * - uruchamia zarejestrowany callback powiadomienia o gotowości klucza.
+     */
     private void handleKeyReady() {
         System.out.println("Key received");
         try {
@@ -253,7 +297,12 @@ public class WebSocketService {
     }
 
     /**
-     * Zamyka aktywne połączenie WebSocket.
+     * Przeprowadza procedurę bezpiecznego i kontrolowanego zamknięcia sesji WebSocket.
+     *
+     * Proces:
+     * - oznacza rozłączenie jako manualne (blokuje automatyczny reconnect),
+     * - wysyła pakiet zamykający z kodem NORMAL_CLOSURE i statusem "logout",
+     * - zwalnia zasoby i czyści referencję do obiektu WebSocket.
      */
     public void disconnect() {
         manuallyDisconnected = true;
@@ -274,6 +323,14 @@ public class WebSocketService {
         System.out.println("WebSocket zamknięty");
     }
 
+    /**
+     * Odpowiada za pętlę automatycznego wznawiania połączenia w osobnym wątku roboczym.
+     *
+     * Proces:
+     * - sprawdza, czy nie trwa już inna próba połączenia lub czy sesja nie została zamknięta ręcznie,
+     * - uruchamia nowy wątek, w którym co 5 sekund wywołuje metodę connect(),
+     * - działa w nieskończonej pętli dopóki referencja na obiekt webSocket pozostaje pusta (null).
+     */
     private void reconnect() {
         if (reconnecting || manuallyDisconnected) {
             return;
@@ -300,8 +357,9 @@ public class WebSocketService {
     }
 
     /**
-     * Ustawia callback wywoływany po otrzymaniu nowej wiadomości.
-     * @param consumer funkcja obsługująca wiadomość
+     * Definiuje zewnętrzny odbiorca wiadomości (konsumenta), realizujący aktualizację kontrolera UI.
+     *
+     * @param consumer interfejs funkcjonalny akceptujący przetworzony obiekt Message
      */
     public void setOnMessageReceived(Consumer<Message> consumer) {
         this.onMessageReceived = consumer;

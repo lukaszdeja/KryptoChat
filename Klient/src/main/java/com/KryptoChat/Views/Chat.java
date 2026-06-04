@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * Widok aplikacji czatu.
  * Zawiera:
- * - listę użytkowników (lewa strona)
+ * - listę użytkowników należących do grupy (lewa strona)
  * - listę wiadomości (prawa część)
  * - pole do wpisywania wiadomości
  * - pasek górny aplikacji

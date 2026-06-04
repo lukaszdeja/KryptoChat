@@ -28,15 +28,15 @@ public class GroupService {
     private final ObjectMapper mapper = new ObjectMapper();
 
     /**
-     * Tworzy nową grupę na backendzie.
+     * Tworzy nową grupę na serwerze i generuje dla niej klucz szyfrujący.
      *
      * Proces:
-     * - buduje request JSON,
-     * - wysyła żądanie POST,
-     * - interpretuje odpowiedź serwera.
+     * - generuje nowy klucz symetryczny AES dla grupy,
+     * - szyfruje go kluczem publicznym twórcy (RSA) i wysyła POST na serwer,
+     * - po udanej odpowiedzi (200) zapisuje klucz grupy lokalnie i aktualizuje sesję.
      *
-     * @param groupName nazwa tworzonej grupy
-     * @return ServiceResponse z informacją o wyniku operacji
+     * @param groupName nazwa nowej grupy
+     * @return ServiceResponse wynik operacji z komunikatem dla UI
      */
     public ServiceResponse createGroup(String groupName) {
 
@@ -72,15 +72,15 @@ public class GroupService {
     }
 
     /**
-     * Dołącza użytkownika do istniejącej grupy.
+     * Dołącza zalogowanego użytkownika do istniejącej grupy na podstawie kodu.
      *
      * Proces:
-     * - buduje request JSON z kodem grupy,
-     * - wysyła żądanie POST,
-     * - analizuje odpowiedź serwera.
+     * - wysyła kod grupy w żądaniu POST na serwer,
+     * - w przypadku sukcesu (200) wywołuje aktualizację tokenu i identyfikatora grupy,
+     * - obsługuje brak grupy (błąd 500).
      *
-     * @param code kod grupy
-     * @return ServiceResponse z wynikiem operacji
+     * @param code unikalny kod grupy
+     * @return ServiceResponse wynik operacji z komunikatem dla UI
      */
     public ServiceResponse joinGroup(String code) {
 
@@ -117,15 +117,15 @@ public class GroupService {
     }
 
     /**
-     * Przetwarza odpowiedź serwera po utworzeniu lub dołączeniu do grupy.
+     * Przetwarza odpowiedź serwera po operacjach na grupach.
      *
-     * Wyciąga:
-     * - nowy JWT token,
-     * - dane użytkownika (w tym groupId),
-     * a następnie aktualizuje TokenStorage.
+     * Proces:
+     * - wyciąga z JSON-a nowy token JWT oraz identyfikator grupy (groupId),
+     * - przypisuje groupId do aktualnego obiektu User,
+     * - zapisuje zaktualizowane dane użytkownika i nowy token w TokenStorage.
      *
-     * @param response odpowiedź HTTP z backendu
-     * @return true jeśli zapis zakończył się sukcesem, false w przeciwnym razie
+     * @param response odpowiedź HTTP z serwera
+     * @return true jeśli pomyślnie zaktualizowano dane sesji; false w przeciwnym wypadku
      */
     private boolean saveResponse(HttpResponse<String> response) {
 

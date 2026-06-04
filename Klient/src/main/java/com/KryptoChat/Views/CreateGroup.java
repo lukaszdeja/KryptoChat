@@ -3,11 +3,14 @@ package com.KryptoChat.Views;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 
 /**
  * Klasa CreateGroup
- * Frontend widoku dołączania do grupy - już istniejącej lub utworzenie nowej, zrealizowany przez VBox
+ * Frontend widoku dołączania do grupy - już istniejącej lub utworzenie nowej, zrealizowany przez VBox. Umożliwia
+ * też wylogowanie przy pomocy przycisku.
  */
 public class CreateGroup extends VBox {
 
@@ -16,16 +19,17 @@ public class CreateGroup extends VBox {
     private Button joinBtn;
     private Button createBtn;
     private Label message;
+    private Button logoutButton;
 
     /**
      * Konstruktor klasy CreateGroup
-     * Buduje interfejs dołączanie/tworzenia grupy
+     * Buduje interfejs dołączanie/tworzenia grupy, umożliwia też wylogowanie.
      */
     public CreateGroup() {
 
         setSpacing(30);
         setAlignment(Pos.CENTER);
-        setPadding(new Insets(40));
+        setPadding(new Insets(20));
         getStyleClass().add("root");
 
         Label title = new Label("KryptoChat");
@@ -70,19 +74,34 @@ public class CreateGroup extends VBox {
 
         createBox.getChildren().addAll(createLabel, nameField, createBtn);
 
+        // przycisk do wylogowania się
+        var url = getClass().getResource("/logout.png");
+        ImageView icon = new ImageView(new Image(url.toExternalForm()));
+        icon.setPreserveRatio(true);
+        icon.setFitHeight(24);
+
+        logoutButton = new Button();
+        logoutButton.setGraphic(icon);
+        logoutButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        logoutButton.setStyle("-fx-background-color: #606695; -fx-background-radius: 5; -fx-cursor: hand;");
+
         // komunikat
         message = new Label();
         message.getStyleClass().add("error-text");
+        message.setStyle("-fx-font-size: 16px;");
 
-        HBox options = new HBox(30, joinBox, createBox);
+        HBox options = new HBox(10, joinBox, createBox);
         options.setAlignment(Pos.CENTER);
 
-        getChildren().addAll(title, subtitle, options, message);
+        getChildren().addAll(title, subtitle, options, logoutButton, message);
+
+
     }
 
     // Gettery
     public Button getJoin() { return joinBtn; }
     public Button getCreate() { return createBtn; }
+    public Button getLogoutButton() { return logoutButton; }
 
     public TextField getCodeField() { return codeField; }
     public TextField getGroupNameField() { return nameField; }

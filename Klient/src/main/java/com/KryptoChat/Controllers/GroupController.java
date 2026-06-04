@@ -3,6 +3,7 @@ package com.KryptoChat.Controllers;
 import com.KryptoChat.Services.ServiceResponse;
 import com.KryptoChat.Views.CreateGroup;
 import com.KryptoChat.Services.GroupService;
+import com.KryptoChat.security.TokenStorage;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 
@@ -21,16 +22,21 @@ public class GroupController {
     /** Akcja przejścia do widoku czatu */
     private Runnable goToChats;
 
+    /** Akcja przejścia do widoku logowania (wylogowanie) */
+    private Runnable goToLogin;
+
     /**
      * Konstruktor kontrolera grup.
      * @param view widok tworzenia/dołączania do grupy
      * @param service serwis obsługujący grupy
      * @param chats akcja przełączająca widok na widok czatu
+     * @param login akcja przełączająca widok na ekran logowania
      */
-    public GroupController(CreateGroup view, GroupService service, Runnable chats) {
+    public GroupController(CreateGroup view, GroupService service, Runnable chats, Runnable login) {
         this.groupView = view;
         this.groupService = service;
         this.goToChats = chats;
+        this.goToLogin = login;
 
         init();
     }
@@ -41,6 +47,20 @@ public class GroupController {
     private void init() {
         groupView.getCreate().setOnAction(e -> createGroup());
         groupView.getJoin().setOnAction(e -> joinGroup());
+        groupView.getLogoutButton().setOnAction(e -> logout());
+    }
+
+    /**
+     * Wylogowuje użytkownika, usuwa zapisany token i czyści pola.
+     */
+    public void logout() {
+        clearFields();
+        groupView.getMessage().setText("");
+        TokenStorage.setUser(null);
+        TokenStorage.setCachedToken(null);
+        TokenStorage.deleteToken();
+
+        goToLogin.run();
     }
 
     /**

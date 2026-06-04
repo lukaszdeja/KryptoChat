@@ -19,15 +19,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.KryptoChat.Models.User;
 
 
-
+/**
+ * Serwis odpowiedzialny za proces uwierzytelniania użytkowników w aplikacji.
+ * Obsługuje komunikację synchroniczną z API logowania, zarządza tokenami sesyjnymi JWT
+ * oraz odpowiada za lokalne odzyskiwanie i odszyfrowywanie asymetrycznej pary kluczy kryptograficznych.
+ */
 public class LoginService {
 
-    /** Metoda obsługująca logowanie
-     * Metoda tworzy obiekt requesta, przesyła go przez JSON, na serwer i na podstawie odpowiedzi
-     * zapisuje token JWT w pliku tekstowym ("ciasteczku")
-     * @param username podany login
-     * @param password podane hasło
-     * @return ServiceResponse - obiekt zawierający bool czy sie udało zalogować i string z komunikatem
+    /**
+     * Loguje użytkownika do systemu i konfiguruje jego sesję.
+     *
+     * Proces:
+     * - wysyła dane logowania (JSON) żądaniem POST na serwer,
+     * - w przypadku sukcesu pobiera token JWT oraz dane użytkownika,
+     * - jeśli na dysku brakuje kluczy, deszyfruje klucz prywatny hasłem i zapisuje go lokalnie,
+     * - zapisuje token i sesję w TokenStorage.
+     *
+     * @param username login użytkownika
+     * @param password hasło użytkownika
+     * @return ServiceResponse wynik operacji (status sukcesu i komunikat dla UI)
      */
     public ServiceResponse login(String username, String password) {
         try {
@@ -92,7 +102,4 @@ public class LoginService {
             return new ServiceResponse(false, "Brak połączenia z serwerem");
         }
     }
-
 }
-
-

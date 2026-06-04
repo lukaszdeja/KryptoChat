@@ -29,12 +29,14 @@ public class Main extends Application {
     private ChatService chatService;
     private AuthentificationService authService;
 
-    /** Metoda start
-     * inicjuje widoki logowania oraz rejestracji
-     * wywoluje pomocnicza metode setupStage budującą okno
-     * @param stage
-     * @throws Exception
+    /**
+     * Inicjalizuje komponenty aplikacji, konfiguruje wstrzykiwanie zależności (DI)
+     * oraz decyduje o widoku startowym na podstawie ważności lokalnego tokenu sesji.
+     *
+     * @param stage główny kontener okna JavaFX
+     * @throws Exception przy błędach inicjalizacji interfejsu lub sieci
      */
+    @Override
     public void start(Stage stage) throws Exception {
         loginPage = new Login(this::showRegister);
         registerPage = new Register(this::showLogin);
@@ -46,16 +48,11 @@ public class Main extends Application {
         chatService = new ChatService();
         loginController = new LoginController(loginPage, loginService, this::showCreateGroup, this::showChats);
         registerController = new RegisterController(registerPage, registerService, this::showLogin);
-        groupController = new GroupController(groupPage, groupService, this::showChats);
+        groupController = new GroupController(groupPage, groupService, this::showChats, this::showLogin);
         authService = new AuthentificationService();
         setupStage(stage);
 
-        // WYBIERZ WIDOK STARTOWY:
-        //showLogin();
-        //showChats();
-         //showCreateGroup();
-        //showRegister();
-
+        // Automatyczne logowanie na podstawie zapisanego tokenu
        String token =  TokenStorage.loadUser();
        if (token == null) {
             showLogin();
@@ -77,7 +74,7 @@ public class Main extends Application {
     }
 
     /**
-     * Metoda, która zmienia źródło wyświetlania w oknie na okno logowania
+     * Przełącza główny widok aplikacji na ekran logowania i ładuje dedykowane style CSS.
      */
     private void showLogin() {
         scene.setRoot(loginPage.getView());
@@ -89,11 +86,10 @@ public class Main extends Application {
     }
 
     /**
-     * Metoda, która zmienia źródło wyświetlania w oknie na okno rejestracji
+     * Przełącza główny widok aplikacji na ekran rejestracji i ładuje dedykowane style CSS.
      */
     private void showRegister() {
         scene.setRoot(registerPage.getView());
-
         scene.getStylesheets().setAll(
                 getClass().getResource("/global.css").toExternalForm(),
                 getClass().getResource("/login.css").toExternalForm()
@@ -101,12 +97,12 @@ public class Main extends Application {
     }
 
     /**
-     * Metoda, która zmienia źródło wyświetlania w oknie na okno czatu
+     * Przełącza główny widok aplikacji na ekran głównego czatu, dynamicznie
+     * odświeżając kontroler czatu oraz odpowiednie pliki stylów.
      */
     private void showChats() {
         chatController = new ChatController(chatPage, chatService, this::showLogin);
         scene.setRoot(chatPage.getView());
-
         scene.getStylesheets().setAll(
                 getClass().getResource("/global.css").toExternalForm(),
                 getClass().getResource("/chat.css").toExternalForm()
@@ -114,11 +110,10 @@ public class Main extends Application {
     }
 
     /**
-     * Metoda, która zmienia źródło wyświetlania w oknie na okno czatu
+     * Przełącza główny widok aplikacji na panel tworzenia/dołączania do grupy i ładuje style CSS.
      */
     private void showCreateGroup() {
         scene.setRoot(groupPage.getView());
-
         scene.getStylesheets().setAll(
                 getClass().getResource("/global.css").toExternalForm(),
                 getClass().getResource("/groups.css").toExternalForm()
@@ -126,23 +121,21 @@ public class Main extends Application {
     }
 
     /**
-     * Główna metoda, która uruchamia aplikację
-     * @param args
-     */
-    public static void main(String[] args) {
-        launch(args);
-    }
-
-    /**
-     * Metoda, która tworzy scenę - okienko
-     * Ustawia tytuł oraz źródło stylów CSS
-     * wyświetla okno
-     * @param stage
+     * Konfiguruje parametry początkowe sceny, ustawia rozmiar okna, tytuł oraz wyświetla aplikację.
+     * @param stage główny obiekt Stage dostarczony przez uruchomienie JavaFX
      */
     private void setupStage(Stage stage) {
         scene = new Scene(loginPage.getView(), 1080, 720);
         stage.setTitle("KryptoChat");
         stage.setScene(scene);
         stage.show();
+    }
+
+    /**
+     * Główna metoda wejściowa programu uruchamiająca proces JavaFX.
+     * @param args argumenty wiersza poleceń
+     */
+    public static void main(String[] args) {
+        launch(args);
     }
 }

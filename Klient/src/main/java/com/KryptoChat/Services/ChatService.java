@@ -76,8 +76,7 @@ public class ChatService {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/messages/"))
                     .header("Authorization", "Bearer " + token)
-                    .GET()
-                    .build();
+                    .GET().build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
@@ -88,10 +87,7 @@ public class ChatService {
                 JsonNode root = mapper.readTree(response.body());
                 JsonNode messagesNode = root.get("messages");
 
-                List<Message> messages = mapper.readValue(
-                        messagesNode.toString(),
-                        new TypeReference<List<Message>>() {}
-                );
+                List<Message> messages = mapper.readValue(messagesNode.toString(), new TypeReference<List<Message>>() {});
 
                 return messages;
             }
