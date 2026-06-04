@@ -4,6 +4,7 @@ import com.KryptoChat.Models.User;
 import com.KryptoChat.security.TokenStorage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.MockedStatic;
@@ -24,20 +25,14 @@ class TokenStorageTest {
 
     @BeforeEach
     void setUp() {
-        // Przygotowujemy ścieżkę do tymczasowego pliku testowego
         tempFile = tempDir.resolve("token_test.dat");
-
-        // Resetujemy stan pamięci podręcznej przed każdym testem
         TokenStorage.setCachedToken(null);
         TokenStorage.setUser(null);
-
-        // Tworzymy statyczny mock dla klasy Files, aby przechwytywać odwołania do plików
         mockedFiles = Mockito.mockStatic(Files.class);
     }
 
     @AfterEach
     void tearDown() {
-        // Zamykamy mockowanie statyczne po każdym teście (bardzo ważne!)
         if (mockedFiles != null) {
             mockedFiles.close();
         }
@@ -46,46 +41,44 @@ class TokenStorageTest {
     }
 
     @Test
+    @DisplayName("saveToken zapisuje token do cache i pliku")
     void shouldSaveTokenToCacheAndFileSuccessfully() {
         String testToken = "sample.jwt.token";
-
-        // Symulujemy, że operacje na katalogach i pliku zakończą się sukcesem
         mockedFiles.when(() -> Files.createDirectories(Mockito.any(Path.class))).thenReturn(null);
         mockedFiles.when(() -> Files.writeString(Mockito.any(Path.class), Mockito.anyString())).thenReturn(null);
 
         TokenStorage.saveToken(testToken);
 
-        assertEquals(testToken, TokenStorage.getCachedToken(), "Token powinien zostać zapisany w cache");
-
-        // Weryfikujemy, czy klasa Files została faktycznie wywołana z poprawnym tokenem
+        assertEquals(testToken, TokenStorage.getCachedToken());
         mockedFiles.verify(() -> Files.writeString(Mockito.any(Path.class), Mockito.eq(testToken)));
     }
 
     @Test
+    @DisplayName("loadUser wczytuje token z pliku gdy plik istnieje")
     void shouldLoadTokenFromFileWhenFileExists() throws Exception {
         String expectedToken = "loaded.jwt.token";
-
-        // Symulujemy, że plik istnieje i zwraca konkretny token
         mockedFiles.when(() -> Files.exists(Mockito.any(Path.class))).thenReturn(true);
         mockedFiles.when(() -> Files.readString(Mockito.any(Path.class))).thenReturn(expectedToken);
 
         String loadedToken = TokenStorage.loadUser();
 
-        assertEquals(expectedToken, loadedToken, "Metoda powinna zwrócić poprawny token");
-        assertEquals(expectedToken, TokenStorage.getCachedToken(), "Token powinien trafić do cache");
+        assertEquals(expectedToken, loadedToken);
+        assertEquals(expectedToken, TokenStorage.getCachedToken());
     }
 
     @Test
+    @DisplayName("loadUser zwraca null gdy plik nie istnieje")
     void shouldReturnNullWhenTokenFileDoesNotExist() {
         mockedFiles.when(() -> Files.exists(Mockito.any(Path.class))).thenReturn(false);
 
         String loadedToken = TokenStorage.loadUser();
 
-        assertNull(loadedToken, "Metoda powinna zwrócić null, jeśli plik nie istnieje");
-        assertNull(TokenStorage.getCachedToken(), "Cache tokenu powinien pozostać pusty");
+        assertNull(loadedToken);
+        assertNull(TokenStorage.getCachedToken());
     }
 
     @Test
+    @DisplayName("deleteToken usuwa plik i czyści cache")
     void shouldDeleteTokenFromFileAndClearCache() {
         TokenStorage.setCachedToken("delete.me.token");
         TokenStorage.setUser(new User());
@@ -93,19 +86,85 @@ class TokenStorageTest {
 
         TokenStorage.deleteToken();
 
-        assertNull(TokenStorage.getCachedToken(), "Token w pamięci powinien zostać wyczyszczony");
-        assertNull(TokenStorage.getUser(), "Użytkownik w pamięci powinien zostać wyczyszczony");
+        assertNull(TokenStorage.getCachedToken());
+        assertNull(TokenStorage.getUser());
     }
 
     @Test
+    @DisplayName("setUser i getUser przechowują użytkownika")
     void shouldGetAndSetUserInCache() {
         User user = new User();
         user.setUsername("TestUser");
 
         TokenStorage.setUser(user);
-        User retrievedUser = TokenStorage.getUser();
 
-        assertNotNull(retrievedUser);
-        assertEquals("TestUser", retrievedUser.getUsername());
+        assertNotNull(TokenStorage.getUser());
+        assertEquals("TestUser", TokenStorage.getUser().getUsername());
+    }
+
+    @Test
+    @DisplayName("getCachedToken zwraca null przed ustawieniem tokenu")
+    void shouldReturnNullWhenTokenNotSet() {
+        assertNull(TokenStorage.getCachedToken());
+    }
+
+    @Test
+    @DisplayName("setCachedToken ustawia token bez zapisu do pliku")
+    void shouldSetCachedTokenWithoutWritingFile() {
+        TokenStorage.setCachedToken("in-memory-only");
+
+        assertEquals("in-memory-only", TokenStorage.getCachedToken());
+        mockedFiles.verify(() -> Files.writeString(Mockito.any(Path.class), Mockito.anyString()), Mockito.never());
+    }
+
+    @Test
+    @DisplayName("setCachedToken nadpisuje poprzedni token")
+    void shouldOverwritePreviousCachedToken() {
+        TokenStorage.setCachedToken("first-token");
+        TokenStorage.setCachedToken("second-token");
+
+        assertEquals("second-token", TokenStorage.getCachedToken());
+    }
+
+    @Test
+    @DisplayName("getUser zwraca null przed ustawieniem użytkownika")
+    void shouldReturnNullUserWhenNotSet() {
+        assertNull(TokenStorage.getUser());
+    }
+
+    @Test
+    @DisplayName("setUser nadpisuje poprzedniego użytkownika")
+    void shouldOverwritePreviousUser() {
+        User first = new User();
+        first.setUsername("First");
+        User second = new User();
+        second.setUsername("Second");
+
+        TokenStorage.setUser(first);
+        TokenStorage.setUser(second);
+
+        assertEquals("Second", TokenStorage.getUser().getUsername());
+    }
+
+    @Test
+    @DisplayName("deleteToken czyści cachedToken gdy plik nie istnieje")
+    void shouldClearCacheEvenWhenFileDoesNotExist() {
+        TokenStorage.setCachedToken("some-token");
+        mockedFiles.when(() -> Files.deleteIfExists(Mockito.any(Path.class))).thenReturn(false);
+
+        TokenStorage.deleteToken();
+
+        assertNull(TokenStorage.getCachedToken());
+    }
+
+    @Test
+    @DisplayName("saveToken wywołuje createDirectories przed zapisem")
+    void shouldCreateDirectoriesBeforeWritingFile() {
+        mockedFiles.when(() -> Files.createDirectories(Mockito.any(Path.class))).thenReturn(null);
+        mockedFiles.when(() -> Files.writeString(Mockito.any(Path.class), Mockito.anyString())).thenReturn(null);
+
+        TokenStorage.saveToken("token");
+
+        mockedFiles.verify(() -> Files.createDirectories(Mockito.any(Path.class)));
     }
 }

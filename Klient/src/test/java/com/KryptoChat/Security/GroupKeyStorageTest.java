@@ -1,104 +1,144 @@
-package com.KryptoChat.Security;
+package com.KryptoChat.security;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Base64;
-
-import com.KryptoChat.security.GroupKeyStorage;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.jupiter.api.Assertions.*;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import java.nio.file.Path;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class GroupKeyStorageTest {
 
-    private MockedStatic<Files> mockedFiles;
-    private final String testUsername = "nacia";
+    @TempDir
+    Path tempDir;
 
     @BeforeEach
     void setUp() {
-        mockedFiles = Mockito.mockStatic(Files.class);
+        System.setProperty("user.home", tempDir.toString());
     }
 
-    @AfterEach
-    void tearDown() {
-        if (mockedFiles != null) {
-            mockedFiles.close();
-        }
-    }
-
-    @Test
-    void shouldReturnCorrectPathStructureForGivenUser() {
-        Path generatedPath = GroupKeyStorage.getPath("testUser");
-
-        assertNotNull(generatedPath);
-        assertTrue(generatedPath.toString().contains(".KryptoChatapp"));
-        assertTrue(generatedPath.toString().contains("keys"));
-        assertTrue(generatedPath.toString().contains("testUser"));
-        assertTrue(generatedPath.toString().endsWith("group.key"));
+    private SecretKey generateAESKey() throws Exception {
+        KeyGenerator gen = KeyGenerator.getInstance("AES");
+        gen.init(256);
+        return gen.generateKey();
     }
 
     @Test
-    void shouldSaveSecretKeyByEncodingItToBase64() throws Exception {
-        byte[] rawKeyBytes = new byte[16];
-        SecretKey secretKey = new SecretKeySpec(rawKeyBytes, "AES");
-        byte[] expectedBase64Bytes = Base64.getEncoder().encode(rawKeyBytes);
-
-        mockedFiles.when(() -> Files.createDirectories(Mockito.any(Path.class))).thenReturn(null);
-        mockedFiles.when(() -> Files.write(Mockito.any(Path.class), Mockito.any(byte[].class))).thenReturn(null);
-
-        GroupKeyStorage.save(testUsername, secretKey);
-
-        mockedFiles.verify(() -> Files.write(
-                Mockito.eq(GroupKeyStorage.getPath(testUsername)),
-                Mockito.eq(expectedBase64Bytes)
-        ));
+    @DisplayName("exists zwraca false gdy klucz nie został zapisany")
+    void exists_KeyNotSaved_ReturnsFalse() {
+        assertThat(GroupKeyStorage.exists("nobody")).isFalse();
     }
 
     @Test
-    void shouldLoadAndReconstructSecretKeySuccessfully() throws Exception {
-        byte[] rawKeyBytes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
-        byte[] base64EncodedBytes = Base64.getEncoder().encode(rawKeyBytes);
+    @DisplayName("exists zwraca true po zapisaniu klucza")
+    void exists_AfterSave_ReturnsTrue() throws Exception {
+        SecretKey key = generateAESKey();
 
-        mockedFiles.when(() -> Files.exists(Mockito.any(Path.class))).thenReturn(true);
-        mockedFiles.when(() -> Files.readAllBytes(Mockito.any(Path.class))).thenReturn(base64EncodedBytes);
+        GroupKeyStorage.save("alice", key);
 
-        SecretKey loadedKey = GroupKeyStorage.load(testUsername);
+        assertThat(GroupKeyStorage.exists("alice")).isTrue();
+    }
 
-        assertNotNull(loadedKey);
-        assertEquals("AES", loadedKey.getAlgorithm());
-        assertArrayEquals(rawKeyBytes, loadedKey.getEncoded());
+
+    @Test
+    @DisplayName("save tworzy plik klucza na dysku")
+    void save_CreatesKeyFile() throws Exception {
+        SecretKey key = generateAESKey();
+
+        GroupKeyStorage.save("bob", key);
+
+        Path keyFile = GroupKeyStorage.getPath("bob");
+        assertThat(keyFile.toFile().exists()).isTrue();
     }
 
     @Test
-    void shouldReturnNullWhenLoadingKeyAndFileDoesNotExist() throws Exception {
-        mockedFiles.when(() -> Files.exists(Mockito.any(Path.class))).thenReturn(false);
+    @DisplayName("save tworzy katalogi nadrzędne jeśli nie istnieją")
+    void save_CreatesMissingDirectories() throws Exception {
+        SecretKey key = generateAESKey();
 
-        SecretKey loadedKey = GroupKeyStorage.load(testUsername);
+        GroupKeyStorage.save("newuser", key);
 
-        assertNull(loadedKey);
+        assertThat(GroupKeyStorage.getPath("newuser").getParent().toFile().exists()).isTrue();
     }
 
     @Test
-    void shouldReturnTrueWhenKeyFileExists() {
-        mockedFiles.when(() -> Files.exists(GroupKeyStorage.getPath(testUsername))).thenReturn(true);
+    @DisplayName("save nadpisuje istniejący klucz nowym")
+    void save_OverwritesExistingKey() throws Exception {
+        SecretKey key1 = generateAESKey();
+        SecretKey key2 = generateAESKey();
 
-        boolean exists = GroupKeyStorage.exists(testUsername);
+        GroupKeyStorage.save("charlie", key1);
+        GroupKeyStorage.save("charlie", key2);
 
-        assertTrue(exists);
+        SecretKey loaded = GroupKeyStorage.load("charlie");
+        assertThat(loaded.getEncoded()).isEqualTo(key2.getEncoded());
+    }
+
+
+    @Test
+    @DisplayName("load zwraca null gdy klucz nie istnieje")
+    void load_KeyNotExists_ReturnsNull() throws Exception {
+        SecretKey result = GroupKeyStorage.load("ghost");
+
+        assertThat(result).isNull();
     }
 
     @Test
-    void shouldReturnFalseWhenKeyFileDoesNotExist() {
-        mockedFiles.when(() -> Files.exists(GroupKeyStorage.getPath(testUsername))).thenReturn(false);
+    @DisplayName("load odtwarza oryginalny klucz AES po zapisie")
+    void load_AfterSave_ReturnsOriginalKey() throws Exception {
+        SecretKey original = generateAESKey();
 
-        boolean exists = GroupKeyStorage.exists(testUsername);
+        GroupKeyStorage.save("dave", original);
+        SecretKey loaded = GroupKeyStorage.load("dave");
 
-        assertFalse(exists);
+        assertThat(loaded).isNotNull();
+        assertThat(loaded.getEncoded()).isEqualTo(original.getEncoded());
+        assertThat(loaded.getAlgorithm()).isEqualTo("AES");
+    }
+
+    @Test
+    @DisplayName("load zwraca klucz z algorytmem AES")
+    void load_ReturnsKeyWithAESAlgorithm() throws Exception {
+        GroupKeyStorage.save("eve", generateAESKey());
+
+        SecretKey loaded = GroupKeyStorage.load("eve");
+
+        assertThat(loaded.getAlgorithm()).isEqualTo("AES");
+    }
+
+    @Test
+    @DisplayName("różni użytkownicy mają niezależne klucze")
+    void save_DifferentUsers_HaveIndependentKeys() throws Exception {
+        SecretKey key1 = generateAESKey();
+        SecretKey key2 = generateAESKey();
+
+        GroupKeyStorage.save("user1", key1);
+        GroupKeyStorage.save("user2", key2);
+
+        assertThat(GroupKeyStorage.load("user1").getEncoded()).isEqualTo(key1.getEncoded());
+        assertThat(GroupKeyStorage.load("user2").getEncoded()).isEqualTo(key2.getEncoded());
+    }
+
+    @Test
+    @DisplayName("getPath zwraca ścieżkę zawierającą nazwę użytkownika i group.key")
+    void getPath_ContainsUsernameAndFilename() {
+        Path path = GroupKeyStorage.getPath("frank");
+
+        assertThat(path.toString()).contains("frank");
+        assertThat(path.getFileName().toString()).isEqualTo("group.key");
+    }
+
+    @Test
+    @DisplayName("getPath różnych użytkowników wskazuje na różne pliki")
+    void getPath_DifferentUsers_ReturnsDifferentPaths() {
+        Path path1 = GroupKeyStorage.getPath("userA");
+        Path path2 = GroupKeyStorage.getPath("userB");
+
+        assertThat(path1).isNotEqualTo(path2);
     }
 }
