@@ -102,9 +102,14 @@ public class WebSocketService {
                                 public void onOpen(WebSocket webSocket) {
                                     System.out.println("Połączono z serwerem");
                                     WebSocketService.this.webSocket = webSocket;
-                                    if (!GroupKeyStorage.exists(TokenStorage.getUser().getUsername())) {
-                                        handleKeyReady();
+                                    try {
+                                        if (!GroupKeyStorage.exists(TokenStorage.getUser().getUsername())) {
+                                            handleKeyReady();
+                                        }
+                                    } catch (NullPointerException e) {
+                                        System.out.println("Brak tokenu - nieautoryzowany dostep");
                                     }
+
 
                                     webSocket.request(1);
                                 }
@@ -127,7 +132,6 @@ public class WebSocketService {
                                                     message.setContent(CryptoService.decryptAES(message.getContent(), aesKey));
                                                 } catch (Exception e) {
                                                     System.out.println("Nie udalo sie odszyfrowac");
-                                                    e.printStackTrace();
                                                 }
                                                 if (onMessageReceived != null) {
                                                     onMessageReceived.accept(message);
@@ -145,7 +149,7 @@ public class WebSocketService {
                                         }
 
                                     } catch (Exception e) {
-                                        e.printStackTrace();
+                                        System.out.println("Blad polaczenia websocket");
                                     }
 
                                     webSocket.request(1);
@@ -176,7 +180,7 @@ public class WebSocketService {
 
         } catch (Exception e) {
 
-            e.printStackTrace();
+            System.out.println("Nie udalo sie nawiazac polaczenia z serwerem");
         }
     }
 
@@ -208,7 +212,7 @@ public class WebSocketService {
                 webSocket.sendText(json, true);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Nie udalo sie przeslac wiadomosci");
         }
     }
 
@@ -253,7 +257,7 @@ public class WebSocketService {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Nie udalo sie przekazac serwerowi klucza");
         }
     }
 
@@ -292,7 +296,7 @@ public class WebSocketService {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Nie udalo sie pobrac klucza z serwera");
         }
     }
 
@@ -347,7 +351,7 @@ public class WebSocketService {
                     Thread.sleep(5000);
 
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    System.out.println("Nie udalo sie polaczyc z serwerem");
                     break;
                 }
             }

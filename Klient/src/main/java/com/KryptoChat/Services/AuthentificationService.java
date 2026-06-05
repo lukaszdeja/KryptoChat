@@ -51,7 +51,7 @@ public class AuthentificationService {
             return mapper.readValue(response.body(), User.class);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Autentyfikacja przebiegla niepomyslnie");
             return null;
         }
     }

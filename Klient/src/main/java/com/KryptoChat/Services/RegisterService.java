@@ -70,7 +70,7 @@ public class RegisterService {
 
         } catch (Exception e) {
 
-            e.printStackTrace();
+            System.out.println("Nie udalo sie zarejestrowac");
 
             return new ServiceResponse(false, "Brak połączenia z serwerem");
         }

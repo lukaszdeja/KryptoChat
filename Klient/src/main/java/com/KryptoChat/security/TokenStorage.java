@@ -37,7 +37,7 @@ public class TokenStorage {
             Files.writeString(FILE, token);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Nie udalo sie zapisac tokenu");
         }
     }
 
@@ -57,7 +57,7 @@ public class TokenStorage {
             return cachedToken;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Nie udalo sie zaczytac tokenu");
         }
 
         return null;
@@ -74,8 +74,7 @@ public class TokenStorage {
             cachedUser = null;
 
         } catch (Exception e) {
-
-            e.printStackTrace();
+            System.out.println("Nie udalo sie usunac tokenu");
         }
     }
 

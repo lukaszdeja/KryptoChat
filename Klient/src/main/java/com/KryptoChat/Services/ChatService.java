@@ -67,7 +67,7 @@ public class ChatService {
             }
 
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            System.out.println("Nie udalo sie pobrac czlonkow grupy z serwera");
         }
 
         return null;
@@ -107,7 +107,7 @@ public class ChatService {
             }
 
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            System.out.println("Nie udalo sie pobrac listy wiadomosci z serwera");
         }
 
         return null;

@@ -34,7 +34,7 @@ public class ChatController {
     private Runnable goToLogin;
 
     /** Serwis obsługujący połączenie WebSocket */
-    private final WebSocketService webSocketService = new WebSocketService();
+    private final WebSocketService webSocketService;
 
     /** Aktualna grupa użytkownika */
     Group group;
@@ -45,10 +45,11 @@ public class ChatController {
      * @param chatService serwis obsługujący dane czatu
      * @param goToLogin akcja wykonywana po wylogowaniu
      */
-    public ChatController(Chat chat, ChatService chatService, Runnable goToLogin){
+    public ChatController(Chat chat, ChatService chatService, Runnable goToLogin, WebSocketService webSocketService){
         this.chatView = chat;
         this.chatService = chatService;
         this.goToLogin = goToLogin;
+        this.webSocketService = webSocketService;
         init();
     }
 
@@ -117,7 +118,6 @@ public class ChatController {
                 }
             } catch (Exception e) {
                 System.out.println("Brak klucza - nie udalo sie odszyfrowac wiadomosci z historii");
-                e.printStackTrace();
             }
             chatView.getMessages().addAll(messages);
         }
@@ -145,6 +145,12 @@ public class ChatController {
         String text = chatView.getMessageField().getText();
 
         if (text == null || text.isEmpty()) return;
+
+        if (text.length() > 500) {
+            System.out.println("Dlugosc wiadomosci nie moze przekraczac 500 znakow");
+            chatView.getMessageField().clear();
+            return;
+        }
 
         Message message = new Message();
 

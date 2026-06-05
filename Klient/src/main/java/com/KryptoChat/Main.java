@@ -28,6 +28,7 @@ public class Main extends Application {
     private GroupService groupService;
     private ChatService chatService;
     private AuthentificationService authService;
+    private WebSocketService webSocketService;
 
     /**
      * Inicjalizuje komponenty aplikacji, konfiguruje wstrzykiwanie zależności (DI)
@@ -46,6 +47,7 @@ public class Main extends Application {
         registerService = new RegisterService();
         groupService = new GroupService();
         chatService = new ChatService();
+        webSocketService = new WebSocketService();
         loginController = new LoginController(loginPage, loginService, this::showCreateGroup, this::showChats);
         registerController = new RegisterController(registerPage, registerService, this::showLogin);
         groupController = new GroupController(groupPage, groupService, this::showChats, this::showLogin);
@@ -101,7 +103,7 @@ public class Main extends Application {
      * odświeżając kontroler czatu oraz odpowiednie pliki stylów.
      */
     private void showChats() {
-        chatController = new ChatController(chatPage, chatService, this::showLogin);
+        chatController = new ChatController(chatPage, chatService, this::showLogin, webSocketService);
         scene.setRoot(chatPage.getView());
         scene.getStylesheets().setAll(
                 getClass().getResource("/global.css").toExternalForm(),

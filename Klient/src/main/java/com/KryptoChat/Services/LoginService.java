@@ -116,7 +116,7 @@ public class LoginService {
             return new ServiceResponse(false, "Błąd serwera");
 
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            System.out.println("Nie udalo sie zalogowac");
             return new ServiceResponse(false, "Brak połączenia z serwerem");
         }
     }

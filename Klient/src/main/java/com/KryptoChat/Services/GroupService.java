@@ -73,7 +73,7 @@ public class GroupService {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Nie udalo sie utworzyc grupy");
             return new ServiceResponse(false, "Brak połączenia z serwerem");
         }
     }
@@ -118,7 +118,7 @@ public class GroupService {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Nie udalo sie dolaczyc do grupy");
             return new ServiceResponse(false, "Brak połączenia z serwerem");
         }
     }
@@ -157,7 +157,7 @@ public class GroupService {
             return true;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Nie udalo sie zapisac danych z serwera");
             return false;
         }
     }

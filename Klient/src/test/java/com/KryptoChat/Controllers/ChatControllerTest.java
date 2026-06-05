@@ -5,6 +5,7 @@ import com.KryptoChat.Models.Message;
 import com.KryptoChat.Models.User;
 import com.KryptoChat.Services.ChatService;
 import com.KryptoChat.Services.CryptoService;
+import com.KryptoChat.Services.WebSocketService;
 import com.KryptoChat.Views.Chat;
 import com.KryptoChat.security.GroupKeyStorage;
 import com.KryptoChat.security.TokenStorage;
@@ -42,6 +43,7 @@ class ChatControllerTest {
     private TextField realMessageField;
     private Label realGroupNameLabel;
     private Label realGroupCodeLabel;
+    private WebSocketService webSocketService;
 
     private ListView<User> realUserList;
     private ObservableList<Message> realMessagesList;
@@ -64,7 +66,7 @@ class ChatControllerTest {
         chatView = Mockito.mock(Chat.class);
         chatService = Mockito.mock(ChatService.class);
         goToLogin = Mockito.mock(Runnable.class);
-
+        webSocketService = Mockito.mock(WebSocketService.class);
         realSendButton = new Button();
         realLogoutButton = new Button();
         realMessageField = new TextField();
@@ -104,7 +106,7 @@ class ChatControllerTest {
         dummyGroup.setUsers(List.of(groupUser1, groupUser2));
         Mockito.when(chatService.loadGroup()).thenReturn(dummyGroup);
 
-        controller = new ChatController(chatView, chatService, goToLogin);
+        controller = new ChatController(chatView, chatService, goToLogin, webSocketService);
     }
 
     @AfterEach
@@ -150,12 +152,27 @@ class ChatControllerTest {
 
     @Test
     void shouldNotSendAnythingIfMessageFieldIsEmpty() {
+        ChatController spyController = Mockito.spy(controller);
+
         realMessageField.setText("");
 
         realSendButton.fire();
 
-        assertEquals("", realMessageField.getText());
+        Mockito.verify(webSocketService, Mockito.never())
+                .send(Mockito.any());
     }
+
+    @Test
+    void shouldNotSendMessageWhenTextIsTooLong() {
+        realMessageField.setText("a".repeat(501));
+
+        realSendButton.fire();
+
+        Mockito.verify(webSocketService, Mockito.never())
+                .send(Mockito.any(Message.class));
+
+    }
+
 
     @Test
     void shouldClearFieldsAndSendMessageViaWebSocketOnSendAction() {
@@ -171,8 +188,6 @@ class ChatControllerTest {
         }
 
         realMessageField.clear();
-
-        assertTrue(realMessageField.getText().isEmpty());
     }
 
     @Test
