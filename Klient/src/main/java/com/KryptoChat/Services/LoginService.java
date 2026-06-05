@@ -26,6 +26,17 @@ import com.KryptoChat.Models.User;
  */
 public class LoginService {
 
+    private final HttpClient client;
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    public LoginService() {
+        this(HttpClient.newHttpClient());
+    }
+
+    public LoginService(HttpClient client) {
+        this.client = client;
+    }
+
     /**
      * Loguje użytkownika do systemu i konfiguruje jego sesję.
      *
@@ -42,13 +53,11 @@ public class LoginService {
     public ServiceResponse login(String username, String password) {
         try {
             LoginRequest loginRequest = new LoginRequest();
-            ObjectMapper mapper = new ObjectMapper();
 
             loginRequest.setUsername(username);
             loginRequest.setPassword(password);
 
             String json = mapper.writeValueAsString(loginRequest);
-            HttpClient client = HttpClient.newHttpClient();
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/login"))
@@ -56,16 +65,19 @@ public class LoginService {
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = client.send(
+                    request,
+                    HttpResponse.BodyHandlers.ofString()
+            );
 
-            if ( response.statusCode() == 500 ) {
+            if (response.statusCode() == 500) {
                 return new ServiceResponse(false, "Niepoprawny login lub hasło");
             }
 
             if (response.statusCode() == 200) {
 
                 JsonNode node = mapper.readTree(response.body());
-                System.out.println(node);
+
                 String token = node.get("jwt").asText();
                 JsonNode tokenNode = node.get("userCredentials");
 
@@ -74,20 +86,27 @@ public class LoginService {
                 }
 
                 User user = mapper.treeToValue(tokenNode, User.class);
+
                 JsonNode encPrivKey = node.get("encryptedPrivateKey");
                 JsonNode pubKey = node.get("publicKey");
+
                 if (encPrivKey != null && pubKey != null) {
                     if (!CryptoService.keysExist(username)) {
                         try {
-                            PrivateKey privateKey = CryptoService.decryptPrivateKeyWithPassword(encPrivKey.asText(), password);
+                            PrivateKey privateKey =
+                                    CryptoService.decryptPrivateKeyWithPassword(encPrivKey.asText(), password);
+
                             PublicKey publicKey = CryptoService.stringToPublicKey(pubKey.asText());
+
                             CryptoService.saveKeyPair(username, new KeyPair(publicKey, privateKey));
+
                         } catch (Exception e) {
                             System.out.println("Nie udalo sie odzyskac kluczy");
                             e.printStackTrace();
                         }
                     }
                 }
+
                 TokenStorage.setUser(user);
                 TokenStorage.saveToken(token);
 
@@ -98,7 +117,6 @@ public class LoginService {
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-
             return new ServiceResponse(false, "Brak połączenia z serwerem");
         }
     }

@@ -20,9 +20,23 @@ import java.util.List;
  */
 public class ChatService {
 
-    private final HttpClient client = HttpClient.newHttpClient();
+    private final HttpClient client;
 
     private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
+    /**
+     * Konstruktor domyślny
+     */
+    public ChatService() {
+        this(HttpClient.newHttpClient());
+    }
+
+    /**
+     * Konstruktor przyjmujący HttpClient
+     */
+    ChatService(HttpClient client) {
+        this.client = client;
+    }
 
     /**
      * Pobiera dane grupy zalogowanego użytkownika.

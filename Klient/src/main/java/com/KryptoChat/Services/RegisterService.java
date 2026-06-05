@@ -14,6 +14,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class RegisterService {
 
+        private final HttpClient client;
+        private final ObjectMapper mapper = new ObjectMapper();
+
+        public RegisterService() {
+            this(HttpClient.newHttpClient());
+        }
+
+        RegisterService(HttpClient client) {
+            this.client = client;
+        }
+
     /**
      * Metoda obsługująca rejestrację, przesyła login oraz hasło na serwer w formacie JSON
      * @param username nazwa uzytkownika
@@ -35,7 +46,6 @@ public class RegisterService {
             register.setEncryptedPrivateKey(CryptoService.encryptPrivateKeyWithPassword(keyPair.getPrivate(), password));
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(register);
-            HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/register"))
                     .header("Content-Type", "application/json")
@@ -43,7 +53,7 @@ public class RegisterService {
                     .build();
 
             HttpResponse<String> response =
-                    client.send(request, HttpResponse.BodyHandlers.ofString());
+                    this.client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if(response.statusCode() == 200) {
                 if (keyPair != null) {

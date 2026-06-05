@@ -22,11 +22,18 @@ import javax.crypto.SecretKey;
 public class GroupService {
 
     /** Klient HTTP używany do komunikacji z backendem */
-    private final HttpClient client = HttpClient.newHttpClient();
+    private final HttpClient client;
 
     /** Mapper JSON do serializacji i deserializacji odpowiedzi */
     private final ObjectMapper mapper = new ObjectMapper();
 
+    public GroupService() {
+        this(HttpClient.newHttpClient());
+    }
+
+    public GroupService(HttpClient client) {
+        this.client = client;
+    }
     /**
      * Tworzy nową grupę na serwerze i generuje dla niej klucz szyfrujący.
      *

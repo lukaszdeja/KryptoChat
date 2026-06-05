@@ -14,6 +14,16 @@ import java.net.http.HttpResponse;
  */
 public class AuthentificationService {
 
+    private String baseUrl = "https://kryptochatserwer-production.up.railway.app";
+
+    public AuthentificationService() {
+        this.baseUrl = "https://kryptochatserwer-production.up.railway.app";
+    }
+
+    public AuthentificationService(String url) {
+        this.baseUrl = url;
+    }
+
     /**
      * Sprawdza poprawność tokenu i pobiera dane użytkownika z API.
      *
@@ -31,7 +41,7 @@ public class AuthentificationService {
             HttpClient client = HttpClient.newHttpClient();
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://kryptochatserwer-production.up.railway.app/api/me"))
+                    .uri(URI.create(baseUrl + "/api/me"))
                     .header("Authorization", "Bearer " + token).GET().build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
