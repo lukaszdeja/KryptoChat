@@ -115,7 +115,7 @@ public class GroupController {
             return;
         }
 
-        if (code.length() != 6) {
+        if (code.length() != 6 || !isCodeValid(code)) {
             groupView.getMessage().setText("Kod grupy powinien zawierać 5 znaków poprzedzonych znakiem #");
             clearFields();
             return;
@@ -139,5 +139,9 @@ public class GroupController {
     private void clearFields() {
         groupView.getGroupNameField().clear();
         groupView.getCodeField().clear();
+    }
+
+    private boolean isCodeValid(String code) {
+        return code != null && code.matches("^#[a-z0-9]{5}$");
     }
 }
