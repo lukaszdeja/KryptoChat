@@ -114,7 +114,7 @@ public class GroupService {
                     return new ServiceResponse(false, "Nie znaleziono grupy");
 
                 default:
-                    return new ServiceResponse(false, "Błąd serwera");
+                    return new ServiceResponse(false, "Kod nie jest prawidłowy lub wystąpił błąd");
             }
 
         } catch (Exception e) {

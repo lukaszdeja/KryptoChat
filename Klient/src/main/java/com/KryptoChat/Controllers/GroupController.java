@@ -115,6 +115,12 @@ public class GroupController {
             return;
         }
 
+        if (code.length() != 6) {
+            groupView.getMessage().setText("Kod grupy powinien zawierać 5 znaków poprzedzonych znakiem #");
+            clearFields();
+            return;
+        }
+
         ServiceResponse response = groupService.joinGroup(code);
         groupView.getMessage().setText(response.getMessage());
 

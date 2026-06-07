@@ -139,23 +139,17 @@ class GroupControllerTest {
     }
 
     @Test
-    void shouldCallServiceAndHandleFailureWhenJoiningGroupFails() {
-        String invalidCode = "BAD_CODE";
-        realCodeField.setText(invalidCode);
-
-        ServiceResponse failureResponse = new ServiceResponse(false, "Niepoprawny kod grupy");
-        Mockito.when(groupService.joinGroup(invalidCode)).thenReturn(failureResponse);
+    void shouldNotCallServiceWhenCodeIsInvalidLength() {
+        realCodeField.setText("BAD_CODE");
 
         realJoinButton.fire();
 
-        Mockito.verify(groupService).joinGroup(invalidCode);
-        assertEquals("Niepoprawny kod grupy", realMessageLabel.getText());
-        assertTrue(realCodeField.getText().isEmpty());
+        Mockito.verifyNoInteractions(groupService);
     }
 
     @Test
     void shouldCallServiceAndHandleSuccessWhenJoiningGroupSucceeds() {
-        String validCode = "ABC123XYZ";
+        String validCode = "#abcde";
         realCodeField.setText(validCode);
 
         ServiceResponse successResponse = new ServiceResponse(true, "Dołączono do grupy!");
