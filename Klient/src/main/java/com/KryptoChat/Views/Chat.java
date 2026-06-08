@@ -114,24 +114,62 @@ public class Chat extends GridPane {
 
         chatList.setCellFactory(param -> new ListCell<>() {
 
-            private final DateTimeFormatter formatter =
-                    DateTimeFormatter.ofPattern("HH:mm");
+            private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+            private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", new java.util.Locale("pl"));
+
+            private final Label dateLabel = new Label();
+            private final Label messageLabel = new Label();
+            private final VBox container = new VBox(4);
+
+            {
+                messageLabel.setWrapText(true);
+                messageLabel.setMaxWidth(Double.MAX_VALUE);
+
+                dateLabel.getStyleClass().add("date-separator");
+                dateLabel.setMaxWidth(Double.MAX_VALUE);
+                dateLabel.setAlignment(Pos.CENTER);
+
+                setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+                setStyle("-fx-background-color: transparent; -fx-padding: 2 0 2 0;");
+            }
 
             @Override
             protected void updateItem(Message msg, boolean empty) {
                 super.updateItem(msg, empty);
+                container.getChildren().clear();
 
                 if (empty || msg == null) {
-                    setText(null);
-                } else {
-                    String time = "";
-
-                    if (msg.getSend_time() != null) {
-                        time = msg.getSend_time().format(formatter);
-                    }
-
-                    setText("[" + time + "] " + msg.getSender() + ": " + msg.getContent());
+                    setGraphic(null);
+                    return;
                 }
+
+                // sprawdź czy poprzednia wiadomość ma inną datę
+                int index = getIndex();
+                boolean showDate = false;
+
+                if (msg.getSend_time() != null){
+                    if(index == 0){
+                        showDate = true;
+                    } else {
+                        Message prev = messages.get(index - 1);
+                        if (prev.getSend_time() != null &&
+                                !prev.getSend_time().toLocalDate().equals(msg.getSend_time().toLocalDate())) {
+                            showDate = true;
+                        }
+                    }
+                }
+
+                if (showDate) {
+                    dateLabel.setText(msg.getSend_time().format(dateFormatter));
+                    container.getChildren().add(dateLabel);
+                }
+
+                String time = msg.getSend_time() != null ? msg.getSend_time().format(timeFormatter) : "";
+                messageLabel.setText("[" + time + "] " + msg.getSender() + ": " + msg.getContent());
+                messageLabel.prefWidthProperty().bind(chatList.widthProperty().subtract(20));
+
+                container.getChildren().add(messageLabel);
+                setGraphic(container);
             }
         });
 
