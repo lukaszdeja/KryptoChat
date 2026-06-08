@@ -100,7 +100,8 @@ public class Chat extends GridPane {
         chatList.getStyleClass().add("chat-list");
         chatList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         chatList.getSelectionModel().clearSelection();
-        chatList.setMouseTransparent(false);
+        chatList.setMouseTransparent(true);
+        chatList.setFocusTraversable(false);
 
         messages.addListener((javafx.collections.ListChangeListener<Message>) change -> {
             while (change.next()) {

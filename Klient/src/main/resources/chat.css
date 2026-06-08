@@ -86,7 +86,7 @@
     -fx-font-size: 13px;
     -fx-text-fill: #888888;
     -fx-padding: 6 0 4 0;
-    -fx-border-color: transparent transparent #cccccc transparent; /* opcjonalna linia */
+    -fx-border-color: transparent transparent #cccccc transparent;
     -fx-border-width: 0 0 1 0;
 }
 
