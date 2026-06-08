@@ -98,6 +98,10 @@ public class WebSocketService {
                             URI.create("wss://kryptochatserwer-production.up.railway.app/ws"),
                             new WebSocket.Listener() {
 
+                                /**
+                                 * Metoda wywolywana przy otwieraniu polaczenia websocket
+                                 * @param webSocket
+                                 */
                                 @Override
                                 public void onOpen(WebSocket webSocket) {
                                     System.out.println("Połączono z serwerem");
@@ -114,6 +118,17 @@ public class WebSocketService {
                                     webSocket.request(1);
                                 }
 
+                                /**
+                                 * Metoda wywolywana przy otrzymywaniu tekstu przez WebSocket
+                                 * @param webSocket
+                                 *         the WebSocket on which the data has been received
+                                 * @param data
+                                 *         the data
+                                 * @param last
+                                 *         whether this invocation completes the message
+                                 *
+                                 * @return
+                                 */
                                 @Override
                                 public CompletionStage<?> onText(
                                         WebSocket webSocket,
@@ -156,6 +171,13 @@ public class WebSocketService {
                                     return null;
                                 }
 
+                                /**
+                                 * Metoda wywolywana przy bledzie - zerwaniu polaczenia
+                                 * @param webSocket
+                                 *         the WebSocket on which the error has occurred
+                                 * @param error
+                                 *         the error
+                                 */
                                 @Override
                                 public void onError(WebSocket webSocket, Throwable error) {
                                     reconnect();
@@ -163,6 +185,17 @@ public class WebSocketService {
                                     error.printStackTrace();
                                 }
 
+                                /**
+                                 * Metoda wywolywana przy standardowym zamknieciu polaczenia
+                                 * @param webSocket
+                                 *         the WebSocket on which the message has been received
+                                 * @param statusCode
+                                 *         the status code
+                                 * @param reason
+                                 *         the reason
+                                 *
+                                 * @return
+                                 */
                                 @Override
                                 public CompletionStage<?> onClose(WebSocket webSocket,
                                                                   int statusCode,
