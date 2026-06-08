@@ -61,6 +61,9 @@ public class RegisterService {
                 }
                 return new ServiceResponse(true, "Utworzono konto");
             }
+            if (response.statusCode() == 400) {
+                return new ServiceResponse(false, "Login lub haslo sa zbyt dlugie");
+            }
 
             if(response.statusCode() == 500) {
                 return new ServiceResponse(false, "Użytkownik już istnieje");

@@ -58,18 +58,26 @@ public class RegisterController {
 
         if (username.isEmpty() || password.isEmpty() || password2.isEmpty()) {
             registerView.getLabel().setText("Pola nie mogą być puste!");
+            clearFields();
             return;
 
+        //} else if (username.length() > 20 || password.length() > 30 || password2.length() > 30) {
+          //  registerView.getLabel().setText("Login powinien miec maskymalnie 20 a haslo 30 znakow");
+            //clearFields();
+            //return;
         } else if (!password.equals(password2)) {
             registerView.getLabel().setText("Hasła się różnią!");
+            clearFields();
             return;
 
         } else if (password.length() < 8) {
             registerView.getLabel().setText("Hasło powinno mieć co najmniej 8 znaków!");
+            clearFields();
             return;
 
         } else if (!validPassword(password)) {
             registerView.getLabel().setText("Hasło powinno zawierać co najmniej 1: wielką litere, małą litere, cyfre i znak specjalny");
+            clearFields();
             return;
         }
 

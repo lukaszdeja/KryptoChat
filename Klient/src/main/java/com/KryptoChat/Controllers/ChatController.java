@@ -9,6 +9,7 @@ import com.KryptoChat.Models.Message;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ListCell;
 import com.KryptoChat.security.GroupKeyStorage;
 import com.KryptoChat.security.TokenStorage;
@@ -146,8 +147,14 @@ public class ChatController {
 
         if (text == null || text.isEmpty()) return;
 
-        if (text.length() > 500) {
-            System.out.println("Dlugosc wiadomosci nie moze przekraczac 500 znakow");
+        if (text.length() > 1500) {
+            System.out.println("Dlugosc wiadomosci nie moze przekraczac 1500 znakow");
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.initOwner(chatView.getScene().getWindow());
+            alert.setTitle("Błąd");
+            alert.setHeaderText("Nie można wysłać wiadomości");
+            alert.setContentText("Długość wiadomości nie może przekraczać 1500 znaków.");
+            alert.showAndWait();
             chatView.getMessageField().clear();
             return;
         }

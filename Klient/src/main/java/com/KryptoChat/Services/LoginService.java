@@ -74,6 +74,12 @@ public class LoginService {
                 return new ServiceResponse(false, "Niepoprawny login lub hasło");
             }
 
+            if (response.statusCode() == 400) {
+                JsonNode node = mapper.readTree(response.body());
+                String message = node.get("message").asText();
+                return new ServiceResponse(false, message);
+            }
+
             if (response.statusCode() == 200) {
 
                 JsonNode node = mapper.readTree(response.body());
