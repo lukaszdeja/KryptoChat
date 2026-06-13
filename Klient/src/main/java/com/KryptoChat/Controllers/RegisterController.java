@@ -60,9 +60,8 @@ public class RegisterController {
             registerView.getLabel().setText("Pola nie mogą być puste!");
             clearFields();
             return;
-
-        } else if (username.length() > 20 || password.length() > 30 || password2.length() > 30) {
-            registerView.getLabel().setText("Login powinien miec maskymalnie 20 a haslo 30 znakow");
+        } else if (username.length() < 3 || username.length() > 20 ) {
+            registerView.getLabel().setText("Login powinien mieć od 3 do 20 znaków");
             clearFields();
             return;
         } else if (!password.equals(password2)) {
@@ -70,8 +69,8 @@ public class RegisterController {
             clearFields();
             return;
 
-        } else if (password.length() < 8) {
-            registerView.getLabel().setText("Hasło powinno mieć co najmniej 8 znaków!");
+        } else if (password.length() < 8 || password.length() > 30 ) {
+            registerView.getLabel().setText("Hasło powinno mieć od 8 do 30 znaków!");
             clearFields();
             return;
 

@@ -91,7 +91,7 @@ class RegisterControllerTest {
 
         realButton.fire();
 
-        assertEquals("Hasło powinno mieć co najmniej 8 znaków!", realLabel.getText());
+        assertEquals("Hasło powinno mieć od 8 do 30 znaków!", realLabel.getText());
         Mockito.verifyNoInteractions(registerService);
     }
 
