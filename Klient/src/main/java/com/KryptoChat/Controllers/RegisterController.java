@@ -61,10 +61,10 @@ public class RegisterController {
             clearFields();
             return;
 
-        //} else if (username.length() > 20 || password.length() > 30 || password2.length() > 30) {
-          //  registerView.getLabel().setText("Login powinien miec maskymalnie 20 a haslo 30 znakow");
-            //clearFields();
-            //return;
+        } else if (username.length() > 20 || password.length() > 30 || password2.length() > 30) {
+            registerView.getLabel().setText("Login powinien miec maskymalnie 20 a haslo 30 znakow");
+            clearFields();
+            return;
         } else if (!password.equals(password2)) {
             registerView.getLabel().setText("Hasła się różnią!");
             clearFields();

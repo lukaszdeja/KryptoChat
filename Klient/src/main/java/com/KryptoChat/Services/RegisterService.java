@@ -74,6 +74,7 @@ public class RegisterService {
         } catch (Exception e) {
 
             System.out.println("Nie udalo sie zarejestrowac");
+            System.out.println(e.getMessage());
 
             return new ServiceResponse(false, "Brak połączenia z serwerem");
         }
