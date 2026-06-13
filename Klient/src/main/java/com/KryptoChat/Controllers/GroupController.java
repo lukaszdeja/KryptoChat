@@ -68,7 +68,7 @@ public class GroupController {
      * Sprawdza poprawność nazwy grupy, wysyła żądanie utworzenia grupy i po sukcesie przełącza widok na czat.
      */
     private void createGroup() {
-        String groupName = groupView.getGroupNameField().getText();
+        String groupName = groupView.getGroupNameField().getText().trim();
 
         if (groupName.isBlank()) {
             groupView.getMessage().setText("Nazwa grupy nie może być pusta");
@@ -107,7 +107,7 @@ public class GroupController {
      * Po poprawnym dołączeniu przełącza widok na widok czatu.
      */
     private void joinGroup() {
-        String code = groupView.getCodeField().getText();
+        String code = groupView.getCodeField().getText().trim();
 
         if (code.isBlank()) {
             groupView.getMessage().setText("Kod grupy nie może być pusty");

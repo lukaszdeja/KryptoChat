@@ -52,8 +52,7 @@ public class RegisterService {
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
 
-            HttpResponse<String> response =
-                    this.client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = this.client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if(response.statusCode() == 200) {
                 if (keyPair != null) {
@@ -62,19 +61,21 @@ public class RegisterService {
                 return new ServiceResponse(true, "Utworzono konto");
             }
             if (response.statusCode() == 400) {
-                return new ServiceResponse(false, "Login lub haslo sa zbyt dlugie");
+                return new ServiceResponse(false, "Login lub hasło są zbyt dlugie");
             }
 
             if(response.statusCode() == 500) {
-                return new ServiceResponse(false, "Użytkownik już istnieje");
+                return new ServiceResponse(false, "Użytkownik już istnieje, nie udało się utworzyć konta");
             }
-
             return new ServiceResponse(false, "Błąd rejestracji");
 
-        } catch (Exception e) {
-
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            System.out.println("Nie udało sie zarejestrować, klucz dla tego użytkownika już istnieje");
+            return new ServiceResponse(false, "Nie udało sie zarejestrować, użytkownik już istnieje");
+        }   catch (Exception e) {
+            e.printStackTrace();
             System.out.println("Nie udalo sie zarejestrowac");
-
             return new ServiceResponse(false, "Brak połączenia z serwerem");
         }
     }

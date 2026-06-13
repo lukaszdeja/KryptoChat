@@ -60,7 +60,7 @@ public class LoginController {
      */
     private void handleLogin() {
 
-        String username = loginView.getLogin().getText();
+        String username = loginView.getLogin().getText().trim();
         String password = loginView.getPassword().getText();
 
         if (username.isEmpty() || password.isEmpty()) {
@@ -69,11 +69,16 @@ public class LoginController {
             return;
         }
 
-      //  if (username.length() > 20 || password.length() > 30) {
-        //    loginView.getLabel().setText("Zla dlugosc nazwy uzytkownika lub hasla");
-          //  clearFields();
-            //return;
-        //}
+       if (username.length() > 20 || username.length() < 3) {
+            loginView.getLabel().setText("Zła długość nazwy użytkownika, powinna mieć od 3 do 20 znaków");
+            clearFields();
+            return;
+        }
+        else if (password.length() < 8 || password.length() > 30) {
+            loginView.getLabel().setText("Zła długość hasła, powinno mieć od 8 do 30 znaków");
+            clearFields();
+            return;
+        }
 
         ServiceResponse response = logservice.login(username, password);
         loginView.getLabel().setText(response.getMessage());

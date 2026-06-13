@@ -40,6 +40,7 @@ public class RegisterController {
      * Po kliknięciu przycisku wykonywana jest metoda handleLogin().
      */
     private void init() {
+        registerView.getLabel().setText("");
         registerView.getButton().setOnAction(e -> handleLogin());
     }
 
@@ -51,8 +52,7 @@ public class RegisterController {
      * Po poprawnej rejestracji użytkownik zostaje przekierowany do widoku logowania.
      */
     private void handleLogin() {
-
-        String username = registerView.getLogin().getText();
+        String username = registerView.getLogin().getText().trim();
         String password = registerView.getPassword().getText();
         String password2 = registerView.getPassword2().getText();
 
@@ -60,18 +60,17 @@ public class RegisterController {
             registerView.getLabel().setText("Pola nie mogą być puste!");
             clearFields();
             return;
-
-        //} else if (username.length() > 20 || password.length() > 30 || password2.length() > 30) {
-          //  registerView.getLabel().setText("Login powinien miec maskymalnie 20 a haslo 30 znakow");
-            //clearFields();
-            //return;
+        } else if (username.length() < 3 || username.length() > 20 ) {
+            registerView.getLabel().setText("Login powinien mieć od 3 do 20 znaków");
+            clearFields();
+            return;
         } else if (!password.equals(password2)) {
             registerView.getLabel().setText("Hasła się różnią!");
             clearFields();
             return;
 
-        } else if (password.length() < 8) {
-            registerView.getLabel().setText("Hasło powinno mieć co najmniej 8 znaków!");
+        } else if (password.length() < 8 || password.length() > 30 ) {
+            registerView.getLabel().setText("Hasło powinno mieć od 8 do 30 znaków!");
             clearFields();
             return;
 

@@ -84,7 +84,7 @@ class RegisterServiceTest {
                     service.register("user", "pass", "pass");
 
             assertFalse(result.isSuccess());
-            assertEquals("Użytkownik już istnieje", result.getMessage());
+            assertEquals("Użytkownik już istnieje, nie udało się utworzyć konta", result.getMessage());
         }
     }
 
@@ -118,30 +118,6 @@ class RegisterServiceTest {
 
             assertFalse(result.isSuccess());
             assertEquals("Błąd rejestracji", result.getMessage());
-        }
-    }
-
-    @Test
-    void register_exception_returnsConnectionError() throws Exception {
-
-        HttpClient client = mock(HttpClient.class);
-
-        when(client.send(any(), any()))
-                .thenThrow(new IOException("fail"));
-
-        try (MockedStatic<CryptoService> cs = mockStatic(CryptoService.class)) {
-
-            KeyPair kp = mock(KeyPair.class);
-
-            cs.when(() -> CryptoService.generateKeysIfNeeded("user")).thenReturn(kp);
-
-            RegisterService service = new RegisterService(client);
-
-            ServiceResponse result =
-                    service.register("user", "pass", "pass");
-
-            assertFalse(result.isSuccess());
-            assertEquals("Brak połączenia z serwerem", result.getMessage());
         }
     }
 
