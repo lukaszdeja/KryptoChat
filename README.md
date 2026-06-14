@@ -38,7 +38,7 @@ Należy wejść do katalogu KryptoChat/Klient/.
 W tym katalogu znajduje się plik pom.xml. Aplikację uruchamiamy wpisując mvn javafx:run. W przypadku uruchamiania dwóch instancji zalecane jest uruchomienie niezalogowanych (jak jest zalogowane, to wylogować się) dwóch instancji w dwóch konsolach. Wówczas bez problemu można zalogować się na dwóch instancjach i testować aplikację.
 
 Testy jednostkowe klienta bez IntelliJ:
-w katalogu KryptoChat/Klient/ uruchamiamy je komendą mvn test
+w katalogu KryptoChat/Klient/ uruchamiamy je komendą mvn test (koniecznie Java 25)
 
 
 
