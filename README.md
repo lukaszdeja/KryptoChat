@@ -33,4 +33,12 @@ Aby uruchomić testy jednostkowe klienta, należy wyszukać na liście plików i
 <img width="772" height="597" alt="image" src="https://github.com/user-attachments/assets/a709a787-e732-4234-bff5-7f80ecc7bcdc" />
 
 
+Uruchomienie bez IntelliJ:
+Należy wejść do katalogu KryptoChat/Klient/.
+W tym katalogu znajduje się plik pom.xml. Aplikację uruchamiamy wpisując mvn javafx:run. W przypadku uruchamiania dwóch instancji zalecane jest uruchomienie niezalogowanych (jak jest zalogowane, to wylogować się) dwóch instancji w dwóch konsolach. Wówczas bez problemu można zalogować się na dwóch instancjach i testować aplikację.
+
+Testy jednostkowe klienta bez IntelliJ:
+w katalogu KryptoChat/Klient/ uruchamiamy je komendą mvn test
+
+
 
