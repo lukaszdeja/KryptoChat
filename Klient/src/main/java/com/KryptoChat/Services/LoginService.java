@@ -99,8 +99,7 @@ public class LoginService {
                 if (encPrivKey != null && pubKey != null) {
                     if (!CryptoService.keysExist(username)) {
                         try {
-                            PrivateKey privateKey =
-                                    CryptoService.decryptPrivateKeyWithPassword(encPrivKey.asText(), password);
+                            PrivateKey privateKey = CryptoService.decryptPrivateKeyWithPassword(encPrivKey.asText(), password);
 
                             PublicKey publicKey = CryptoService.stringToPublicKey(pubKey.asText());
 
