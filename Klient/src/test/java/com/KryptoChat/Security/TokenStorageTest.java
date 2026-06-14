@@ -1,4 +1,4 @@
-package com.KryptoChat.Security;
+package com.KryptoChat.security;
 
 import com.KryptoChat.Models.User;
 import com.KryptoChat.security.TokenStorage;
@@ -15,6 +15,9 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Testy jednostkowe przechowywania Tokenu na kliencie
+ */
 class TokenStorageTest {
 
     @TempDir
