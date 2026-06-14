@@ -10,7 +10,7 @@ import java.util.Base64;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Klasa obsługuje serwis rejestracji, realizacja backendu
+ * Klasa obsługuje serwis rejestracji, przesylanie na serwer danych tworzonego konta
  */
 public class RegisterService {
 

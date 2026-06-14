@@ -55,6 +55,14 @@ public class WebSocketService {
     /** Callback informujący aplikację o poprawnym odebraniu klucza szyfrującego grupę */
     private Runnable onKeyReceived;
 
+    /** Callback informujacy klienta o tym ze ktos dolaczyl do grupy - wiec mozna zaczytac liste czlonkow grupy od nowa*/
+    private Runnable onGroupUpdated;
+
+
+    public void setOnGroupUpdated(Runnable onGroupUpdated) {
+        this.onGroupUpdated = onGroupUpdated;
+    }
+
     /**
      * Rejestruje akcję zwrotną dla zdarzenia odebrania nowego klucza szyfrującego.
      * * @param callback obiekt typu Runnable do wykonania po pobraniu klucza
@@ -257,7 +265,7 @@ public class WebSocketService {
      * - konwertuje tekstowy klucz publiczny odbiorcy na obiekt PublicKey,
      * - szyfruje klucz grupy kluczem publicznym odbiorcy (asymetrycznie),
      * - wysyła zaszyfrowany pakiet żądaniem POST pod punkt końcowy /deliver-key.
-     *
+     * Dodatkowo powiadamia kontroler ze moze ponownie zaczytac czlonkow grupy (ktos dolaczyl)
      * @param targetUserId identyfikator użytkownika, który wnioskuje o dostęp do klucza grupy
      * @param targetPubKeyString klucz publiczny wnioskodawcy zakodowany tekstowo
      */
@@ -285,6 +293,9 @@ public class WebSocketService {
 
             if (response.statusCode() == 200) {
                 System.out.println("Klucz dostarczony dla usera: " + targetUserId);
+                if (onGroupUpdated != null) {
+                    onGroupUpdated.run();
+                }
             } else {
                 System.out.println("Blad dostarczania klucza");
             }

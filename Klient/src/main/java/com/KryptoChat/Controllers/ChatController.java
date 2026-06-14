@@ -78,6 +78,10 @@ public class ChatController {
             });
         });
 
+        webSocketService.setOnGroupUpdated(() -> {
+            Platform.runLater(this::loadGroup);
+        });
+
         webSocketService.connect();
     }
 
