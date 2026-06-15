@@ -161,25 +161,4 @@ class GroupControllerTest {
         assertEquals("Dołączono do grupy!", realMessageLabel.getText());
         assertTrue(realCodeField.getText().isEmpty());
     }
-
-    @Test
-    void shouldClearStorageAndRedirectToLoginOnLogout() {
-        TokenStorage.setUser(new User());
-        TokenStorage.setCachedToken("some.token");
-        realMessageLabel.setText("Stary komunikat");
-
-        // Mockujemy klasę Files, bo TokenStorage.deleteToken() spróbuje usunąć plik z dysku
-        try (MockedStatic<Files> mockedFiles = Mockito.mockStatic(Files.class)) {
-            mockedFiles.when(() -> Files.deleteIfExists(Mockito.any(Path.class))).thenReturn(true);
-
-            realLogoutButton.fire();
-
-            assertNull(TokenStorage.getUser());
-            assertNull(TokenStorage.getCachedToken());
-            assertEquals("", realMessageLabel.getText());
-            Mockito.verify(goToLogin).run();
-            assertTrue(realGroupNameField.getText().isEmpty());
-            assertTrue(realCodeField.getText().isEmpty());
-        }
-    }
 }

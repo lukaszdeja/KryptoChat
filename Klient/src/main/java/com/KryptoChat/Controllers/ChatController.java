@@ -10,12 +10,16 @@ import com.KryptoChat.Models.Message;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListCell;
 import com.KryptoChat.security.GroupKeyStorage;
 import com.KryptoChat.security.TokenStorage;
 
 import javax.crypto.SecretKey;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.time.LocalDateTime;
 
@@ -132,8 +136,50 @@ public class ChatController {
 
     /**
      * Wylogowuje użytkownika, usuwa zapisany token oraz rozłącza WebSocket.
+     * Umożliwia opcję usunięcia kluczy szyfrujących z urządzenia - na przykład jeżeli ktoś zalogował
+     * sie na innym urządzeniu i nie chce zeby klucze na nim pozostaly
      */
     public void logout() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.initOwner(chatView.getScene().getWindow());
+        alert.setTitle("Wylogowanie");
+        alert.setHeaderText("Usunąć lokalne klucze?");
+        alert.setContentText(
+                "Czy chcesz usunąć wszystkie lokalnie zapisane klucze kryptograficzne?"
+        );
+        ButtonType keepButton = new ButtonType("Zostaw");
+        ButtonType deleteButton = new ButtonType("Usuń klucze");
+        ButtonType cancelButton = new ButtonType("Anuluj");
+        alert.getButtonTypes().setAll(
+                keepButton,
+                deleteButton,
+                cancelButton
+        );
+        var result = alert.showAndWait();
+        if (result.isEmpty() || result.get() == cancelButton) {
+            return;
+        }
+        if (result.get() == deleteButton) {
+            try {
+                Path userDir = GroupKeyStorage
+                        .getPath(TokenStorage.getUser().getUsername())
+                        .getParent();
+                if (Files.exists(userDir)) {
+                    Files.walk(userDir)
+                            .sorted(Comparator.reverseOrder())
+                            .forEach(path -> {
+                                try {
+                                    Files.delete(path);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         TokenStorage.setUser(null);
         TokenStorage.setCachedToken(null);
         TokenStorage.deleteToken();

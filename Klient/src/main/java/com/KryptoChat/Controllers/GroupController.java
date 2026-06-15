@@ -3,9 +3,16 @@ package com.KryptoChat.Controllers;
 import com.KryptoChat.Services.ServiceResponse;
 import com.KryptoChat.Views.CreateGroup;
 import com.KryptoChat.Services.GroupService;
+import com.KryptoChat.security.GroupKeyStorage;
 import com.KryptoChat.security.TokenStorage;
 import javafx.animation.PauseTransition;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.util.Duration;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
 
 /**
  * Kontroler obsługujący tworzenie oraz dołączanie do grupy.
@@ -52,8 +59,49 @@ public class GroupController {
 
     /**
      * Wylogowuje użytkownika, usuwa zapisany token i czyści pola.
+     * Umożliwia także usunięcie lokalnych kluczy szyfrujących jeżeli ktoś zalogował się na
+     * innym urządzeniu
      */
     public void logout() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.initOwner(groupView.getScene().getWindow());
+        alert.setTitle("Wylogowanie");
+        alert.setHeaderText("Usunąć lokalne klucze?");
+        alert.setContentText(
+                "Czy chcesz usunąć wszystkie lokalnie zapisane klucze kryptograficzne?"
+        );
+        ButtonType keepButton = new ButtonType("Zostaw");
+        ButtonType deleteButton = new ButtonType("Usuń klucze");
+        ButtonType cancelButton = new ButtonType("Anuluj");
+        alert.getButtonTypes().setAll(
+                keepButton,
+                deleteButton,
+                cancelButton
+        );
+        var result = alert.showAndWait();
+        if (result.isEmpty() || result.get() == cancelButton) {
+            return;
+        }
+        if (result.get() == deleteButton) {
+            try {
+                Path userDir = GroupKeyStorage
+                        .getPath(TokenStorage.getUser().getUsername())
+                        .getParent();
+                if (Files.exists(userDir)) {
+                    Files.walk(userDir)
+                            .sorted(Comparator.reverseOrder())
+                            .forEach(path -> {
+                                try {
+                                    Files.delete(path);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         clearFields();
         groupView.getMessage().setText("");
         TokenStorage.setUser(null);

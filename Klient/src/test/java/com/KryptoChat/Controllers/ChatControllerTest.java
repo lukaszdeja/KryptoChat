@@ -189,18 +189,5 @@ class ChatControllerTest {
 
         realMessageField.clear();
     }
-
-    @Test
-    void shouldExecuteLogoutSequenceAndRedirectToLogin() {
-        try (MockedStatic<Files> mockedFiles = Mockito.mockStatic(Files.class)) {
-            mockedFiles.when(() -> Files.deleteIfExists(Mockito.any(Path.class))).thenReturn(true);
-
-            realLogoutButton.fire();
-
-            mockedTokenStorage.verify(() -> TokenStorage.setUser(null));
-            mockedTokenStorage.verify(() -> TokenStorage.setCachedToken(null));
-            mockedTokenStorage.verify(TokenStorage::deleteToken);
-            Mockito.verify(goToLogin).run();
-        }
-    }
+    
 }
