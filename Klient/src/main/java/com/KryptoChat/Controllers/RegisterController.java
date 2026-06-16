@@ -52,7 +52,7 @@ public class RegisterController {
      */
     private void handleLogin() {
 
-        String username = registerView.getLogin().getText();
+        String username = registerView.getLogin().getText().trim();
         String password = registerView.getPassword().getText();
         String password2 = registerView.getPassword2().getText();
 

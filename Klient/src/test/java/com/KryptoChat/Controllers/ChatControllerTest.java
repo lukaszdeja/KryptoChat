@@ -189,5 +189,5 @@ class ChatControllerTest {
 
         realMessageField.clear();
     }
-    
+
 }

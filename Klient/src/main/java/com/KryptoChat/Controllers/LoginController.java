@@ -60,7 +60,7 @@ public class LoginController {
      */
     private void handleLogin() {
 
-        String username = loginView.getLogin().getText();
+        String username = loginView.getLogin().getText().trim();
         String password = loginView.getPassword().getText();
 
         if (username.isEmpty() || password.isEmpty()) {
